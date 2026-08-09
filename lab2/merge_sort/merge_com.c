@@ -157,8 +157,7 @@ int main()
     /* Generate Gnuplot Script */
     FILE *gp = fopen("plot.gp", "w");
 
-    fprintf(gp, "set terminal png size 1000,800\n");
-    fprintf(gp, "set output 'merge_comp.png'\n");
+    
     fprintf(gp, "set datafile separator ','\n");
     fprintf(gp, "set title 'Merge Sort vs Modified Merge Sort'\n");
     fprintf(gp, "set xlabel 'Input Size (N)'\n");
@@ -166,6 +165,8 @@ int main()
     fprintf(gp, "set grid\n");
     fprintf(gp, "set key top left\n");
     fprintf(gp, "set terminal qt\n");
+    //fprintf(gp, "set terminal png size 1000,800\n");
+    //fprintf(gp, "set output 'merge_comp.png'\n");
     fprintf(gp, "plot 'output.csv' using 1:2 with linespoints lw 2 pt 7 title 'Merge Sort',\\\n");
     fprintf(gp, "     'output.csv' using 1:3 with linespoints lw 2 pt 5 title 'Modified Merge Sort'\n");
     fprintf(gp, "pause -1\n");
