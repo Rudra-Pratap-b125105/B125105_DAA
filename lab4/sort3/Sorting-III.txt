@@ -13,7 +13,10 @@ Algorithm FindKSum(S, n, k, T)
 7. Stop.
 
 WORKING OF THE PROGRAM
-The program accepts n integers, k and the target T. It first sorts the set using Merge Sort. It then recursively chooses k-1 distinct elements. For every such selection, it calculates the value required to make the total equal to T. Binary Search is used on the sorted array to check for the required final element. Starting the search after the last selected position prevents the same element from being used twice.
+The program accepts n integers, k and the target T. It first sorts the set using Merge Sort. It then recursively chooses k-1
+distinct elements. For every such selection, it calculates the value required to make the total equal to T. Binary Search is used
+on the sorted array to check for the required final element. Starting the search after the last selected position prevents the
+same element from being used twice.
 
 TIME COMPLEXITY
 Sorting:
