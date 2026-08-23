@@ -14,7 +14,10 @@ Algorithm MergeIntervals(I, n)
 5. Stop.
 
 WORKING OF THE PROGRAM
-The program accepts n intervals as pairs (start, end). It first sorts the intervals by their starting points. The first interval is placed in the result. Each following interval is compared with the last merged interval. If the intervals overlap, their ending point is extended to the larger ending point. If they do not overlap, the current interval is added separately. This produces a list containing only non-overlapping merged intervals.
+The program accepts n intervals as pairs (start, end). It first sorts the intervals by their starting points. The first interval
+is placed in the result. Each following interval is compared with the last merged interval. If the intervals overlap, their ending
+point is extended to the larger ending point. If they do not overlap, the current interval is added separately. This produces a
+list containing only non-overlapping merged intervals.
 
 TIME COMPLEXITY
 Sorting n intervals:
