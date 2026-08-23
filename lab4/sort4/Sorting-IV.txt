@@ -1,0 +1,54 @@
+APPLICATION OF SORTING-IV
+Find the Time When the Maximum Number of People Are Present
+
+PSEUDOCODE
+Algorithm MaximumPeople(entry, exit, n)
+1. Create two events for every person:
+      (entry time, +1)
+      (exit time, -1)
+2. Store all 2n events.
+3. Sort the events by time.
+4. Set current = 0, maximum = 0.
+5. Scan the sorted events:
+      current = current + event.type
+      If current > maximum:
+          maximum = current
+          bestTime = event.time
+6. Output bestTime and maximum.
+7. Stop.
+
+WORKING OF THE PROGRAM
+Each person's entry is represented by an event with value +1, while the exit is represented by -1. Thus, there are 2n events. After sorting the events by time, the program scans them from left to right. The current count represents the number of people currently present. Whenever this count becomes larger than the previous maximum, the corresponding time is stored. Since all entry and exit times are distinct, no tie handling is required.
+
+TIME COMPLEXITY
+Creating 2n events:
+T1(n) = O(n)
+
+Sorting 2n events:
+T2(n) = O(2n log(2n))
+       = O(n log n)
+
+Scanning the events:
+T3(n) = O(2n)
+       = O(n)
+
+Therefore:
+T(n) = O(n) + O(n log n) + O(n)
+     = O(n log n)
+
+The sorting step dominates the total running time.
+
+Space complexity:
+2n events are stored, so space complexity is O(n).
+
+SAMPLE OUTPUT
+Input:
+Person 1: 1 7
+Person 2: 2 5
+Person 3: 4 8
+Person 4: 6 9
+Person 5: 3 10
+
+Output:
+Maximum people present: 4
+Time when maximum occurred: 6

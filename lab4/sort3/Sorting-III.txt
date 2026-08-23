@@ -1,0 +1,49 @@
+APPLICATION OF SORTING-III
+Find k Integers Whose Sum is T
+
+PSEUDOCODE
+Algorithm FindKSum(S, n, k, T)
+1. Sort S using Merge Sort.
+2. Recursively select k-1 distinct elements.
+3. For each selection, calculate:
+      required = T - sum of selected elements.
+4. Use Binary Search to check whether required exists after the selected elements.
+5. If found, return the k elements.
+6. If all combinations are checked, report that no such k elements exist.
+7. Stop.
+
+WORKING OF THE PROGRAM
+The program accepts n integers, k and the target T. It first sorts the set using Merge Sort. It then recursively chooses k-1 distinct elements. For every such selection, it calculates the value required to make the total equal to T. Binary Search is used on the sorted array to check for the required final element. Starting the search after the last selected position prevents the same element from being used twice.
+
+TIME COMPLEXITY
+Sorting:
+T1(n) = O(n log n)
+
+The algorithm selects up to k-1 elements. For fixed k, the number of combinations to examine is bounded by:
+O(n^(k-1))
+
+For each selection, Binary Search takes:
+O(log n)
+
+Therefore:
+T2(n) = O(n^(k-1) log n)
+
+Including sorting:
+T(n) = O(n log n) + O(n^(k-1) log n)
+
+For k >= 2, the second term dominates:
+T(n) = O(n^(k-1) log n)
+
+Thus, the required worst-case complexity is O(n^(k-1) log n).
+
+Space complexity is O(n) for the array, plus O(k) for the selected elements and recursion.
+
+SAMPLE OUTPUT
+Input:
+S = 2 4 7 9 11 15
+k = 3
+T = 20
+
+Output:
+3 elements found whose sum is 20:
+2 7 11

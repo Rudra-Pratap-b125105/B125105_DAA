@@ -1,0 +1,61 @@
+APPLICATION OF SORTING-I
+Sort Items by Colour While Preserving Number Order
+
+PSEUDOCODE
+Algorithm SortByColour(A, n)
+1. Create three groups: Red, Blue and Yellow.
+2. Scan A from left to right.
+3. If the colour is Red, append the item to Red.
+4. Else if the colour is Blue, append the item to Blue.
+5. Otherwise append the item to Yellow.
+6. Copy all Red items back to A.
+7. Copy all Blue items after the Red items.
+8. Copy all Yellow items after the Blue items.
+9. Stop.
+
+WORKING OF THE PROGRAM
+The input contains pairs consisting of a number and a colour. The numbers are already sorted. The program scans the input only once and places each pair into its corresponding colour array. Since the scan is from left to right, the numbers inside each colour group remain in their original sorted order. Finally, the three groups are combined in the order Red, Blue and Yellow.
+
+TIME COMPLEXITY
+Let r, b and y be the numbers of Red, Blue and Yellow items.
+
+Classification scan:
+n operations -> O(n)
+
+Copying the three groups:
+r + b + y operations
+
+Since r + b + y = n:
+O(r + b + y) = O(n)
+
+Total:
+T(n) = O(n) + O(n)
+     = O(n)
+
+Therefore, the worst-case time complexity is O(n).
+
+Auxiliary space:
+Three arrays together can contain at most n elements, so space complexity is O(n).
+
+SAMPLE OUTPUT
+Input:
+7
+10 Red
+15 Blue
+20 Yellow
+25 Red
+30 Blue
+35 Yellow
+40 Red
+
+Output:
+Number  Colour
+10      Red
+25      Red
+40      Red
+15      Blue
+30      Blue
+20      Yellow
+35      Yellow
+
+The order of numbers within each colour is preserved.

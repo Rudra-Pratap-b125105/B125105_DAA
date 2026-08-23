@@ -1,0 +1,120 @@
+Application of Sorting-VI: Maximum Overlapping Intervals
+
+PSEUDOCODE
+
+Algorithm MaximumOverlapIntervals(S)
+Input: n intervals (li, ri)
+Output: Maximum number of overlapping intervals and points where this maximum occurs
+
+1. Create an event for every left endpoint:
+      (li, +1)
+2. Create an event for every right endpoint:
+      (ri, -1)
+3. Sort all 2n events by their point.
+   If two events have the same point, process a start event before an end event.
+4. Set current = 0 and maximum = 0.
+5. Scan all sorted events:
+      current = current + event.type
+      if current > maximum:
+          maximum = current
+6. Scan the sorted events again:
+      update current using event.type
+      whenever current == maximum, record that point.
+7. Display maximum and all recorded points.
+8. Stop.
+
+WORKING OF THE PROGRAM
+
+The program uses a sweep-line technique.
+
+For every interval (l, r), two events are created:
+- l with type +1, representing a person/interval entering.
+- r with type -1, representing a person/interval leaving.
+
+All 2n events are then sorted according to their positions on the line. Since an endpoint is considered part of its interval, if a starting and ending event occur at the same point, the starting event is processed first.
+
+After sorting, the program scans the events from left to right. The variable 'current' stores the number of intervals currently active. Whenever an interval starts, current increases by 1; whenever an interval ends, current decreases by 1.
+
+During the first scan, the program finds the largest value reached by 'current'. This is the maximum number of simultaneously overlapping intervals.
+
+During the second scan, the program identifies the points at which this maximum overlap is reached and displays them.
+
+For example, for:
+(10,40), (20,60), (50,90), (15,70)
+
+the maximum overlap is 3. Points such as 20 and 50 are points where the maximum overlap is reached.
+
+TIME COMPLEXITY CALCULATION
+
+Suppose there are n intervals.
+
+1. Creating events:
+   Each interval produces two events, one start event and one end event.
+
+   Number of events = 2n
+
+   Creating all events takes:
+       O(n)
+
+2. Sorting the events:
+   The program sorts 2n events using qsort().
+
+   Sorting m elements takes O(m log m), where m = 2n.
+
+       O(2n log(2n))
+
+   Since 2 is a constant:
+
+       O(2n log(2n))
+       = O(n(log n + log 2))
+       = O(n log n)
+
+3. First scan:
+   The program scans all 2n events once to find the maximum overlap.
+
+       O(2n) = O(n)
+
+4. Second scan:
+   The program scans all 2n events once again to identify points where the maximum is reached.
+
+       O(2n) = O(n)
+
+5. Total time:
+
+       O(n) + O(n log n) + O(n) + O(n)
+
+       = O(n log n)
+
+Therefore, the worst-case time complexity is:
+
+       O(n log n)
+
+The sorting step dominates the linear scans.
+
+SPACE COMPLEXITY
+
+The program stores 2n events.
+
+Therefore, the auxiliary space required is:
+
+       O(2n) = O(n)
+
+SAMPLE INPUT
+
+Enter number of intervals: 4
+
+Enter intervals (left right):
+Interval 1: 10 40
+Interval 2: 20 60
+Interval 3: 50 90
+Interval 4: 15 70
+
+SAMPLE OUTPUT
+
+Maximum number of overlapping intervals: 3
+Points where maximum overlap begins:
+20 50
+
+CONCLUSION
+
+The program implements the sweep-line algorithm using sorting. By converting every interval into a start and an end event, sorting the events, and scanning them, the maximum number of simultaneously overlapping intervals can be found efficiently. The overall worst-case running time is O(n log n).

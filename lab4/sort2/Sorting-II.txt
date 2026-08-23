@@ -1,0 +1,41 @@
+APPLICATION OF SORTING-II
+Find a Pair from Two Sets Whose Sum is x
+
+PSEUDOCODE
+Algorithm FindPair(S1, S2, n, x)
+1. Sort S2 using Merge Sort.
+2. For every element a in S1:
+      required = x - a
+      Perform Binary Search for required in S2.
+3. If required is found, return the pair (a, required).
+4. If all elements are checked without success, report that no pair exists.
+5. Stop.
+
+WORKING OF THE PROGRAM
+The program accepts two sets S1 and S2 of n integers and a target x. It first sorts S2 using Merge Sort. For each element of S1, it calculates the value required from S2 to make the sum equal to x. Since S2 is sorted, Binary Search is used to find this required value efficiently. When a value is found, the corresponding pair is displayed.
+
+TIME COMPLEXITY
+Merge Sort is applied to n elements of S2:
+T1(n) = O(n log n)
+
+There are n elements in S1. For every element, Binary Search is performed on S2:
+T2(n) = n * O(log n)
+      = O(n log n)
+
+Therefore:
+T(n) = T1(n) + T2(n)
+     = O(n log n) + O(n log n)
+     = O(n log n)
+
+The linear scan over S1 is included in the n binary searches and does not change the bound.
+
+Space complexity is O(n) for Merge Sort's temporary storage.
+
+SAMPLE OUTPUT
+Input:
+S1 = 2 7 11 15 20
+S2 = 4 9 13 18 25
+x = 20
+
+Output:
+Pair found: 11 + 9 = 20

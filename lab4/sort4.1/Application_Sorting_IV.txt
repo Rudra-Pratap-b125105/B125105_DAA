@@ -1,0 +1,152 @@
+APPLICATION OF SORTING-IV
+Maximum Number of People Simultaneously Present at a Party
+
+1. PSEUDOCODE
+
+Algorithm FindMaximumPeople
+Input: n persons, each with entry time ai and exit time bi
+Output: Maximum number of people present and the time when it occurs
+
+1. Create an array EVENTS of size 2n.
+2. For each person i from 1 to n:
+      a. Read entry time ai in HH:MM format.
+      b. Read exit time bi in HH:MM format.
+      c. Convert both times into total minutes.
+      d. Store (entry time, +1) in EVENTS.
+      e. Store (exit time, -1) in EVENTS.
+3. Sort EVENTS in increasing order of time.
+4. Set current = 0, maximum = 0, maxTime = 0.
+5. Scan EVENTS from beginning to end:
+      a. If the event is an entry, increase current by 1.
+      b. If the event is an exit, decrease current by 1.
+      c. If current > maximum:
+             maximum = current
+             maxTime = current event's time.
+6. Output maximum and maxTime.
+7. Stop.
+
+
+2. WORKING OF THE PROGRAM
+
+The program uses an event-based representation. Every person's entry and exit
+are converted into two events:
+
+    Entry -> +1
+    Exit  -> -1
+
+For example, if a person enters at 09:30 and exits at 11:15:
+
+    (570, +1)
+    (675, -1)
+
+where the times are represented as minutes from midnight.
+
+All 2n events are then sorted according to their time using the C library
+qsort() function.
+
+After sorting, the program scans the events from left to right. Whenever an
+entry event is encountered, the number of people currently present is
+increased. Whenever an exit event is encountered, it is decreased.
+
+Whenever the current number of people becomes greater than the previous
+maximum, the program stores both the new maximum and the corresponding time.
+
+Finally, the stored time is converted back from minutes into HH:MM format
+for display.
+
+Since all entry and exit times are distinct, there are no ties that require
+special handling.
+
+
+3. TIME COMPLEXITY CALCULATION
+
+There are n people and therefore 2n events.
+
+Step 1: Creating the events
+
+Two events are created for every person.
+
+Number of operations = 2n
+
+Therefore:
+
+    O(n)
+
+Step 2: Converting the times
+
+Each HH:MM time is converted into minutes using:
+
+    hour * 60 + minute
+
+This takes constant time for each time.
+
+There are 2n times:
+
+    O(n)
+
+Step 3: Sorting the events
+
+There are 2n events. qsort() performs comparison-based sorting.
+
+Time complexity:
+
+    O((2n) log(2n))
+
+Since constants do not affect asymptotic complexity:
+
+    O(n log n)
+
+Step 4: Scanning the sorted events
+
+The program scans all 2n events exactly once.
+
+Therefore:
+
+    O(2n) = O(n)
+
+Total:
+
+    O(n) + O(n) + O(n log n) + O(n)
+
+    = O(n log n)
+
+Therefore, the overall time complexity is:
+
+    O(n log n)
+
+
+Space Complexity:
+
+The program stores 2n events.
+
+Therefore, auxiliary space complexity is:
+
+    O(n)
+
+
+4. SAMPLE INPUT
+
+Enter number of people: 5
+
+Enter entry and exit time for each person (HH:MM):
+Person 1: 09:00 11:00
+Person 2: 09:30 10:30
+Person 3: 09:45 11:30
+Person 4: 10:00 12:00
+Person 5: 10:15 11:15
+
+
+5. SAMPLE OUTPUT
+
+----------------------------------
+Maximum people present: 4
+Time when maximum occurred: 10:15
+----------------------------------
+
+
+6. CONCLUSION
+
+The program successfully determines the time at which the maximum number of
+people are simultaneously present at the party. By representing entry and
+exit times as events and sorting the 2n events, the required O(n log n)
+running time is achieved.

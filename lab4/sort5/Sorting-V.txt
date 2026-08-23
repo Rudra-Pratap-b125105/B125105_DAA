@@ -1,0 +1,49 @@
+APPLICATION OF SORTING-V
+Merge Overlapping Intervals
+
+PSEUDOCODE
+Algorithm MergeIntervals(I, n)
+1. Sort all intervals according to their starting point.
+2. Put the first interval into the result list.
+3. For every remaining interval:
+      If its start <= end of the last result interval:
+          Extend the last result interval if necessary.
+      Otherwise:
+          Add it as a new interval.
+4. Return the result list.
+5. Stop.
+
+WORKING OF THE PROGRAM
+The program accepts n intervals as pairs (start, end). It first sorts the intervals by their starting points. The first interval is placed in the result. Each following interval is compared with the last merged interval. If the intervals overlap, their ending point is extended to the larger ending point. If they do not overlap, the current interval is added separately. This produces a list containing only non-overlapping merged intervals.
+
+TIME COMPLEXITY
+Sorting n intervals:
+T1(n) = O(n log n)
+
+Scanning the sorted intervals once:
+T2(n) = O(n)
+
+Therefore:
+T(n) = O(n log n) + O(n)
+     = O(n log n)
+
+The sorting step dominates the linear merging pass.
+
+Space complexity is O(n) for the result representation.
+
+SAMPLE OUTPUT
+Input:
+(1, 3)
+(2, 6)
+(8, 10)
+(7, 18)
+
+After sorting:
+(1, 3)
+(2, 6)
+(7, 18)
+(8, 10)
+
+Output:
+Merged intervals:
+(1, 6), (7, 18)

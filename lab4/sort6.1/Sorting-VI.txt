@@ -1,0 +1,56 @@
+APPLICATION OF SORTING-VI
+Find a Point Covered by the Maximum Number of Intervals
+
+PSEUDOCODE
+Algorithm MaximumOverlapPoint(I, n)
+1. Create two events for every interval:
+      (left endpoint, +1)
+      (right endpoint, -1)
+2. Store all 2n events.
+3. Sort events by position.
+4. If two events have the same position, process the start (+1) before the end (-1), because endpoints belong to their intervals.
+5. Set current = 0 and maximum = 0.
+6. Scan all events:
+      current = current + event.type
+      If current > maximum:
+          maximum = current
+          bestPoint = event.position
+7. Output bestPoint and maximum.
+8. Stop.
+
+WORKING OF THE PROGRAM
+The program converts every interval into two events: a start event that increases the number of active intervals and an end event that decreases it. All 2n events are sorted by their coordinate. The program then sweeps from left to right while maintaining the number of intervals containing the current point. When a new maximum is reached, that coordinate is saved as the required point. If endpoints coincide, starts are processed before ends so that the endpoint is counted as belonging to both intervals as required.
+
+TIME COMPLEXITY
+Creating 2n events:
+T1(n) = O(n)
+
+Sorting 2n events:
+T2(n) = O(2n log(2n))
+       = O(n log n)
+
+Scanning all events:
+T3(n) = O(2n)
+       = O(n)
+
+Therefore:
+T(n) = O(n) + O(n log n) + O(n)
+     = O(n log n)
+
+The sorting step is the dominant operation.
+
+Space complexity:
+2n events are stored, giving O(n) auxiliary space.
+
+SAMPLE OUTPUT
+Input:
+(10, 40)
+(20, 60)
+(50, 90)
+(15, 70)
+
+Output:
+Point with maximum overlap: 20
+Maximum number of intervals: 3
+
+Note: Any point in the common region of three intervals is a valid answer; 50 is also a valid answer for the given example.
