@@ -18,7 +18,10 @@ Algorithm MaximumPeople(entry, exit, n)
 7. Stop.
 
 WORKING OF THE PROGRAM
-Each person's entry is represented by an event with value +1, while the exit is represented by -1. Thus, there are 2n events. After sorting the events by time, the program scans them from left to right. The current count represents the number of people currently present. Whenever this count becomes larger than the previous maximum, the corresponding time is stored. Since all entry and exit times are distinct, no tie handling is required.
+Each person's entry is represented by an event with value +1, while the exit is represented by -1. Thus, there are 2n events.
+After sorting the events by time, the program scans them from left to right. The current count represents the number of people
+currently present. Whenever this count becomes larger than the previous maximum, the corresponding time is stored. Since all entry
+and exit times are distinct, no tie handling is required.
 
 TIME COMPLEXITY
 Creating 2n events:
