@@ -12,7 +12,9 @@ Algorithm FindPair(S1, S2, n, x)
 5. Stop.
 
 WORKING OF THE PROGRAM
-The program accepts two sets S1 and S2 of n integers and a target x. It first sorts S2 using Merge Sort. For each element of S1, it calculates the value required from S2 to make the sum equal to x. Since S2 is sorted, Binary Search is used to find this required value efficiently. When a value is found, the corresponding pair is displayed.
+The program accepts two sets S1 and S2 of n integers and a target x. It first sorts S2 using Merge Sort. For each element of S1,
+it calculates the value required from S2 to make the sum equal to x. Since S2 is sorted, Binary Search is used to find this
+required value efficiently. When a value is found, the corresponding pair is displayed.
 
 TIME COMPLEXITY
 Merge Sort is applied to n elements of S2:
