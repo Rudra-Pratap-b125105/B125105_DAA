@@ -14,7 +14,9 @@ Algorithm SortByColour(A, n)
 9. Stop.
 
 WORKING OF THE PROGRAM
-The input contains pairs consisting of a number and a colour. The numbers are already sorted. The program scans the input only once and places each pair into its corresponding colour array. Since the scan is from left to right, the numbers inside each colour group remain in their original sorted order. Finally, the three groups are combined in the order Red, Blue and Yellow.
+The input contains pairs consisting of a number and a colour. The numbers are already sorted. The program scans the input only
+once and places each pair into its corresponding colour array. Since the scan is from left to right, the numbers inside each
+colour group remain in their original sorted order. Finally, the three groups are combined in the order Red, Blue and Yellow.
 
 TIME COMPLEXITY
 Let r, b and y be the numbers of Red, Blue and Yellow items.
