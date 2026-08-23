@@ -19,7 +19,10 @@ Algorithm MaximumOverlapPoint(I, n)
 8. Stop.
 
 WORKING OF THE PROGRAM
-The program converts every interval into two events: a start event that increases the number of active intervals and an end event that decreases it. All 2n events are sorted by their coordinate. The program then sweeps from left to right while maintaining the number of intervals containing the current point. When a new maximum is reached, that coordinate is saved as the required point. If endpoints coincide, starts are processed before ends so that the endpoint is counted as belonging to both intervals as required.
+The program converts every interval into two events: a start event that increases the number of active intervals and an end event
+that decreases it. All 2n events are sorted by their coordinate. The program then sweeps from left to right while maintaining the
+number of intervals containing the current point. When a new maximum is reached, that coordinate is saved as the required point.
+If endpoints coincide, starts are processed before ends so that the endpoint is counted as belonging to both intervals as required.
 
 TIME COMPLEXITY
 Creating 2n events:
