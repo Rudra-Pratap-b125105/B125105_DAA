@@ -31,11 +31,14 @@ For every interval (l, r), two events are created:
 - l with type +1, representing a person/interval entering.
 - r with type -1, representing a person/interval leaving.
 
-All 2n events are then sorted according to their positions on the line. Since an endpoint is considered part of its interval, if a starting and ending event occur at the same point, the starting event is processed first.
+All 2n events are then sorted according to their positions on the line. Since an endpoint is considered part of its interval, if a
+starting and ending event occur at the same point, the starting event is processed first.
 
-After sorting, the program scans the events from left to right. The variable 'current' stores the number of intervals currently active. Whenever an interval starts, current increases by 1; whenever an interval ends, current decreases by 1.
+After sorting, the program scans the events from left to right. The variable 'current' stores the number of intervals currently
+active. Whenever an interval starts, current increases by 1; whenever an interval ends, current decreases by 1.
 
-During the first scan, the program finds the largest value reached by 'current'. This is the maximum number of simultaneously overlapping intervals.
+During the first scan, the program finds the largest value reached by 'current'. This is the maximum number of simultaneously
+overlapping intervals.
 
 During the second scan, the program identifies the points at which this maximum overlap is reached and displays them.
 
