@@ -1,0 +1,131 @@
+DAA LAB-5
+QUESTION 1: FIND THE MEDIAN WITHOUT SORTING
+
+PROBLEM STATEMENT
+Given a list of N numbers, find the median of the list without sorting the list. Analyze the complexity of the algorithm.
+
+APPROACH
+Use the Quickselect algorithm, a modified form of Quick Sort. Quickselect partitions the array around a pivot but continues only in the partition containing the required middle element.
+
+For odd N:
+Median = element at zero-based index N/2.
+
+For even N:
+Median = average of the elements at indices N/2 - 1 and N/2.
+
+The complete list is therefore not sorted.
+
+ALGORITHM
+1. Read N and the N elements.
+2. If N is odd, set k = N/2 and use Quickselect to find the element at index k.
+3. If N is even, use Quickselect to find the elements at indices N/2 - 1 and N/2.
+4. Average the two middle elements.
+5. Display the median.
+
+PSEUDOCODE
+QUICKSELECT(A, low, high, k)
+    while low <= high
+        pivotIndex <- PARTITION(A, low, high)
+
+        if pivotIndex = k
+            return A[pivotIndex]
+        else if k < pivotIndex
+            high <- pivotIndex - 1
+        else
+            low <- pivotIndex + 1
+
+PARTITION(A, low, high)
+    pivot <- A[high]
+    i <- low - 1
+
+    for j <- low to high - 1
+        if A[j] <= pivot
+            i <- i + 1
+            swap A[i] and A[j]
+
+    swap A[i + 1] and A[high]
+    return i + 1
+
+FIND_MEDIAN(A, N)
+    if N is odd
+        k <- N/2
+        median <- QUICKSELECT(A, 0, N-1, k)
+    else
+        k1 <- N/2 - 1
+        k2 <- N/2
+        x <- QUICKSELECT(A, 0, N-1, k1)
+        y <- QUICKSELECT(A, 0, N-1, k2)
+        median <- (x + y) / 2
+
+    return median
+
+WORKING
+Example:
+N = 7
+Elements = 12 3 5 7 4 19 26
+
+The required zero-based index is:
+N/2 = 3
+
+Quickselect repeatedly partitions the relevant portion of the array. It does not recursively sort both partitions. It continues only toward the partition containing index 3.
+
+The element at index 3 is 7, so:
+Median = 7
+
+For an even example:
+Elements = 12 3 5 7 4 19
+The two middle elements are 7 and 12.
+Median = (7 + 12)/2 = 9.50
+
+TIME COMPLEXITY
+Partitioning a subarray of size N takes O(N).
+
+Best case:
+If the pivot immediately reaches the required position:
+O(N)
+
+Average case:
+T(N) = T(N/2) + O(N)
+     = O(N) + O(N/2) + O(N/4) + ...
+     = O(N)
+
+For an even-sized list, Quickselect may be performed twice, but:
+O(N) + O(N) = O(N)
+
+Therefore average-case complexity = O(N).
+
+Worst case:
+If the pivot is always the smallest or largest element:
+T(N) = T(N-1) + O(N)
+     = N + (N-1) + ... + 1
+     = N(N+1)/2
+     = O(N^2)
+
+SPACE COMPLEXITY
+The implementation uses the array in-place and constant auxiliary variables:
+O(1) auxiliary space.
+
+COMPLEXITY SUMMARY
+Best case: O(N)
+Average case: O(N)
+Worst case: O(N^2)
+Auxiliary space: O(1)
+
+SAMPLE OUTPUT
+Enter the number of elements: 7
+Enter 7 elements:
+12 3 5 7 4 19 26
+Median = 7
+
+IMPORTANT VIVA POINTS
+1. Why Quickselect instead of sorting?
+   We only need the median, not the complete sorted order. Quickselect has average O(N) time.
+
+2. Does Quickselect sort the array?
+   No. It only partitions enough of the array to locate the required order statistic.
+
+3. What is the worst case?
+   O(N^2), when partitions are extremely unbalanced.
+
+4. What is the guaranteed linear-time alternative?
+   Median of Medians gives O(N) worst-case selection, but Quickselect is simpler and commonly used in the lab.

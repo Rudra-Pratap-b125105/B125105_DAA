@@ -1,0 +1,155 @@
+DAA LAB-5
+QUESTION 3: IMPLEMENT QUICK SORT FOR N RANDOM ELEMENTS STORED IN A FILE
+
+PROBLEM STATEMENT
+Implement Quick Sort for N randomly generated elements stored in a file. Analyze the complexity of the algorithm.
+
+APPROACH
+Use Quick Sort with the Divide and Conquer technique.
+
+The program:
+1. Reads N.
+2. Generates N random integers.
+3. Stores the numbers in input.txt.
+4. Reads the numbers from the file into an array.
+5. Sorts the array using Quick Sort.
+6. Displays the original and sorted elements.
+
+Quick Sort selects a pivot and partitions the array into elements less than or equal to the pivot and elements greater than the pivot. It then recursively sorts both partitions.
+
+ALGORITHM
+QUICKSORT(A, low, high)
+1. If low < high, partition the array.
+2. Select the last element as pivot.
+3. Rearrange elements around the pivot.
+4. Let p be the final pivot position.
+5. Recursively sort A[low ... p-1].
+6. Recursively sort A[p+1 ... high].
+
+FILE HANDLING
+1. Open input.txt in write mode.
+2. Generate N random integers and write them to the file.
+3. Close the file.
+4. Open input.txt in read mode.
+5. Read N elements into the array.
+6. Close the file.
+7. Apply Quick Sort.
+
+PSEUDOCODE
+QUICKSORT(A, low, high)
+    if low < high
+        p <- PARTITION(A, low, high)
+        QUICKSORT(A, low, p - 1)
+        QUICKSORT(A, p + 1, high)
+
+PARTITION(A, low, high)
+    pivot <- A[high]
+    i <- low - 1
+
+    for j <- low to high - 1
+        if A[j] <= pivot
+            i <- i + 1
+            swap A[i] and A[j]
+
+    swap A[i + 1] and A[high]
+    return i + 1
+
+GENERATE_FILE(N)
+    open input.txt for writing
+    for i <- 0 to N-1
+        generate random number
+        write number to file
+    close file
+
+MAIN
+    Read N
+    GENERATE_FILE(N)
+    Open input.txt for reading
+    Read N elements into A
+    Close file
+    QUICKSORT(A, 0, N-1)
+    Display sorted array
+
+WORKING
+Example random input:
+347 82 591 14 763 205 438 96
+
+These values are stored in input.txt and then read into the array.
+
+Suppose 96 is chosen as a pivot. Partitioning places values <= 96 before it and larger values after it. Quick Sort then recursively processes the two resulting partitions.
+
+Eventually the array becomes:
+14 82 96 205 347 438 591 763
+
+The exact values vary because the program generates random numbers.
+
+TIME COMPLEXITY
+Partitioning N elements takes O(N).
+
+BEST CASE
+The pivot divides the array into approximately equal halves:
+T(N) = 2T(N/2) + O(N)
+Therefore:
+T(N) = O(N log N)
+
+AVERAGE CASE
+For random input, partitions are expected to be reasonably balanced:
+T(N) = O(N log N)
+
+WORST CASE
+If the pivot is repeatedly the smallest or largest element:
+T(N) = T(N-1) + O(N)
+     = N + (N-1) + ... + 1
+     = N(N+1)/2
+     = O(N^2)
+
+SPACE COMPLEXITY
+The array is sorted in-place. Recursive calls use stack space.
+
+Best/Average case:
+O(log N) auxiliary stack space.
+
+Worst case:
+O(N) auxiliary stack space.
+
+FILE COMPLEXITY
+Generating N numbers: O(N)
+Writing N numbers: O(N)
+Reading N numbers: O(N)
+
+These linear file operations do not dominate the average Quick Sort complexity of O(N log N).
+
+COMPLEXITY SUMMARY
+Generate random elements: O(N)
+Write to file: O(N)
+Read from file: O(N)
+Quick Sort best: O(N log N)
+Quick Sort average: O(N log N)
+Quick Sort worst: O(N^2)
+Auxiliary space average: O(log N)
+Auxiliary space worst: O(N)
+
+SAMPLE OUTPUT
+Enter the number of elements: 10
+
+Elements read from file:
+347 82 591 14 763 205 438 96 521 67
+
+Sorted elements using Quick Sort:
+14 67 82 96 205 347 438 521 591 763
+
+IMPORTANT VIVA POINTS
+1. What technique does Quick Sort use?
+   Divide and Conquer.
+
+2. What is the average complexity?
+   O(N log N).
+
+3. What is the worst case?
+   O(N^2), usually caused by repeatedly choosing a very poor pivot.
+
+4. Does file handling change the sorting complexity?
+   No. Reading and writing are O(N), while average Quick Sort is O(N log N).
+
+5. Is Quick Sort in-place?
+   Yes, apart from recursion stack space.
