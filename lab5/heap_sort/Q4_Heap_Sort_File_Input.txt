@@ -173,18 +173,3 @@ Elements read from file:
 Sorted elements using Heap Sort:
 14 67 82 96 205 347 438 521 591 763
 
-IMPORTANT VIVA POINTS
-1. Why use a Max Heap for ascending order?
-   The maximum element is placed at the root and can be moved to the end of the array repeatedly.
-
-2. Complexity of building a heap?
-   O(N) using bottom-up construction.
-
-3. Complexity of Heap Sort?
-   O(N log N) in best, average, and worst cases.
-
-4. Does Heap Sort need extra array memory?
-   No. It is an in-place sorting algorithm.
-
-5. Main advantage over ordinary Quick Sort?
-   Heap Sort guarantees O(N log N) worst-case time.
