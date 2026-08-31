@@ -117,15 +117,3 @@ Enter 7 elements:
 12 3 5 7 4 19 26
 Median = 7
 
-IMPORTANT VIVA POINTS
-1. Why Quickselect instead of sorting?
-   We only need the median, not the complete sorted order. Quickselect has average O(N) time.
-
-2. Does Quickselect sort the array?
-   No. It only partitions enough of the array to locate the required order statistic.
-
-3. What is the worst case?
-   O(N^2), when partitions are extremely unbalanced.
-
-4. What is the guaranteed linear-time alternative?
-   Median of Medians gives O(N) worst-case selection, but Quickselect is simpler and commonly used in the lab.
