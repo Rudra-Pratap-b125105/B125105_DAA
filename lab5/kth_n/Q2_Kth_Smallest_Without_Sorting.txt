@@ -106,18 +106,3 @@ Enter 8 elements:
 Enter the value of K: 4
 4th smallest element = 7
 
-IMPORTANT VIVA POINTS
-1. Why is the index K - 1?
-   Because array indexing begins at zero.
-
-2. How is Quickselect different from Quick Sort?
-   Quick Sort recursively processes both partitions; Quickselect processes only the partition containing the required element.
-
-3. Does the array need to be sorted?
-   No.
-
-4. Average complexity?
-   O(N).
-
-5. Worst-case complexity?
-   O(N^2).
