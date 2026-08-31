@@ -138,18 +138,3 @@ Elements read from file:
 Sorted elements using Quick Sort:
 14 67 82 96 205 347 438 521 591 763
 
-IMPORTANT VIVA POINTS
-1. What technique does Quick Sort use?
-   Divide and Conquer.
-
-2. What is the average complexity?
-   O(N log N).
-
-3. What is the worst case?
-   O(N^2), usually caused by repeatedly choosing a very poor pivot.
-
-4. Does file handling change the sorting complexity?
-   No. Reading and writing are O(N), while average Quick Sort is O(N log N).
-
-5. Is Quick Sort in-place?
-   Yes, apart from recursion stack space.
