@@ -1,0 +1,105 @@
+DAA LAB–6
+Q4. MATRIX CHAIN MULTIPLICATION USING DYNAMIC PROGRAMMING
+
+AIM
+Given the dimensions of a chain of matrices in arr[], determine the minimum number of
+scalar multiplications required to multiply the complete matrix chain.
+
+If arr[] has N dimensions, there are N-1 matrices:
+A1 = arr[0] x arr[1]
+A2 = arr[1] x arr[2]
+...
+A(N-1) = arr[N-2] x arr[N-1]
+
+PSEUDOCODE
+MATRIX_CHAIN(arr, N)
+    for i = 1 to N-1
+        dp[i][i] = 0
+
+    for chainLength = 2 to N-1
+        for i = 1 to N-chainLength
+            j = i + chainLength - 1
+            dp[i][j] = infinity
+
+            for k = i to j-1
+                cost = dp[i][k]
+                      + dp[k+1][j]
+                      + arr[i-1] * arr[k] * arr[j]
+
+                if cost < dp[i][j]
+                    dp[i][j] = cost
+
+    return dp[1][N-1]
+
+
+SAMPLE INPUT
+4
+10 30 5 60
+
+SAMPLE OUTPUT
+Minimum number of scalar multiplications = 4500
+
+EXPLANATION
+The matrices are:
+A1 = 10 x 30
+A2 = 30 x 5
+A3 = 5 x 60
+
+Option 1:
+(A1 x A2) x A3
+
+Cost of A1 x A2:
+10 x 30 x 5 = 1500
+
+Cost of resulting (10 x 5) matrix x A3:
+10 x 5 x 60 = 3000
+
+Total = 1500 + 3000 = 4500.
+
+Option 2:
+A1 x (A2 x A3)
+
+Cost of A2 x A3:
+30 x 5 x 60 = 9000
+
+Cost of A1 x resulting (30 x 60) matrix:
+10 x 30 x 60 = 18000
+
+Total = 27000.
+
+Therefore the minimum is 4500.
+
+TIME COMPLEXITY — HOW IT IS CALCULATED
+There are three levels of work.
+
+1. CHAIN LENGTH LOOP
+chainLength ranges from 2 to N-1.
+Number of iterations = O(N).
+
+2. STARTING POSITION LOOP
+For a fixed chain length, there are O(N) possible starting positions i.
+So this contributes another O(N).
+
+3. SPLIT POSITION LOOP
+For each interval [i,j], k ranges from i to j-1.
+In the worst case this is O(N) split positions.
+
+Each split performs constant-time arithmetic and comparisons.
+
+Therefore:
+T(N) = O(N) * O(N) * O(N)
+     = O(N^3).
+
+More precisely, the number of DP interval/split evaluations is a cubic-order summation,
+so the dominant term is proportional to N^3. Lower-order terms are ignored in Big-O.
+
+Therefore, TIME COMPLEXITY = O(N^3).
+
+SPACE COMPLEXITY
+The DP table contains N x N entries.
+Therefore:
+SPACE = O(N^2).
+
+IMPORTANT
+The algorithm does not actually multiply the matrices. It only finds the best order of
+parenthesization and the minimum number of scalar multiplications.

@@ -1,0 +1,87 @@
+DAA LAB–6
+Q3. LONGEST COMMON SUBSEQUENCE (LCS) — LENGTH + ACTUAL SUBSEQUENCE
+
+AIM
+Given two strings, find the length of their Longest Common Subsequence and display one
+valid LCS using Dynamic Programming.
+
+IDEA
+Create a DP table where dp[i][j] is the LCS length of the first i characters of X and
+the first j characters of Y.
+
+PSEUDOCODE
+LCS(X, Y)
+    m = length(X)
+    n = length(Y)
+
+    create dp[0..m][0..n]
+
+    for i = 0 to m
+        for j = 0 to n
+            if i == 0 OR j == 0
+                dp[i][j] = 0
+            else if X[i-1] == Y[j-1]
+                dp[i][j] = dp[i-1][j-1] + 1
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+
+    length = dp[m][n]
+
+    i = m
+    j = n
+    while i > 0 AND j > 0
+        if X[i-1] == Y[j-1]
+            put X[i-1] into LCS
+            i--
+            j--
+        else if dp[i-1][j] > dp[i][j-1]
+            i--
+        else
+            j--
+
+    reverse the collected LCS
+    print length and LCS
+
+
+SAMPLE INPUT
+ABCBDAB
+BDCABA
+
+SAMPLE OUTPUT
+Length of LCS = 4
+Longest Common Subsequence = BCBA
+
+NOTE
+An LCS is not necessarily unique. BCBA is one valid LCS for this input; BDAB is another.
+
+TIME COMPLEXITY — HOW IT IS CALCULATED
+PHASE 1: BUILD DP TABLE
+The table has (m+1)(n+1) cells.
+The outer loop runs m+1 times = O(m).
+The inner loop runs n+1 times = O(n).
+Each cell uses constant work.
+
+Therefore:
+T1(m,n) = O(mn).
+
+PHASE 2: BACKTRACK
+The backtracking starts at (m,n).
+At every iteration, at least one of i or j decreases.
+Therefore it can take at most m+n steps.
+
+T2(m,n) = O(m+n).
+
+TOTAL
+T(m,n) = O(mn) + O(m+n)
+       = O(mn)
+
+because mn grows at least as fast as m+n for nontrivial positive dimensions.
+
+Therefore, TIME COMPLEXITY = O(mn).
+
+SPACE COMPLEXITY
+DP table = (m+1)(n+1) = O(mn).
+LCS storage is O(min(m,n)) for the resulting string.
+The DP table dominates.
+
+Therefore, SPACE COMPLEXITY = O(mn).

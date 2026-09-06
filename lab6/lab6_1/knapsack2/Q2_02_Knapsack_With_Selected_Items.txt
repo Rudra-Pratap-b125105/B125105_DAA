@@ -1,0 +1,63 @@
+DAA LAB–6
+Q2. 0/1 KNAPSACK — MAXIMUM PROFIT + SELECTED ITEMS
+
+AIM
+Find the maximum profit and display which item(s) were selected.
+
+IDEA
+First construct the normal 0/1 Knapsack DP table.
+Then backtrack from dp[n][W].
+If dp[i][w] != dp[i-1][w], item i was selected.
+
+PSEUDOCODE
+KNAPSACK(n, W)
+    build dp[0..n][0..W] using the normal 0/1 Knapsack recurrence
+
+    i = n
+    w = W
+
+    while i > 0 AND w > 0
+        if dp[i][w] != dp[i-1][w]
+            print item i
+            w = w - weight[i-1]
+
+        i = i - 1
+
+    print maximum profit dp[n][W]
+
+
+SAMPLE INPUT
+4
+2 3 4 5
+3 4 5 6
+5
+
+SAMPLE OUTPUT
+Maximum Profit = 7
+Selected Items: 2 1
+
+TIME COMPLEXITY — HOW IT IS CALCULATED
+PHASE 1: BUILD DP TABLE
+There are (n+1)(W+1) states.
+Each state takes O(1).
+So table construction = O(nW).
+
+PHASE 2: BACKTRACK
+We start at (n,W).
+At each step, i decreases by 1.
+When an item is selected, w also decreases.
+The loop can execute at most O(n) iterations.
+
+So:
+Total = O(nW) + O(n)
+     = O(nW)
+
+Therefore, TIME COMPLEXITY = O(nW).
+
+SPACE COMPLEXITY
+DP table = O(nW).
+The backtracking variables use O(1) extra space.
+Therefore total = O(nW).
+
+IMPORTANT
+Backtracking does not change the overall asymptotic complexity because O(nW) dominates O(n).

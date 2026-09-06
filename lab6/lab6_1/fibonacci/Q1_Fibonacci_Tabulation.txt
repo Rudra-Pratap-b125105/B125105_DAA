@@ -1,0 +1,52 @@
+DAA LAB–6
+Q1. FIBONACCI USING DYNAMIC PROGRAMMING — BOTTOM-UP TABULATION
+
+AIM
+Find the nth Fibonacci number using Dynamic Programming.
+
+IDEA
+Use an array dp[] to store Fibonacci values already calculated.
+F(0)=0, F(1)=1, and F(n)=F(n-1)+F(n-2).
+
+PSEUDOCODE
+FIBONACCI_TABULATION(n)
+    if n == 0
+        return 0
+    dp[0] = 0
+    dp[1] = 1
+
+    for i = 2 to n
+        dp[i] = dp[i-1] + dp[i-2]
+
+    return dp[n]
+
+SAMPLE INPUT
+10
+
+SAMPLE OUTPUT
+The 10th Fibonacci number is 55
+
+TIME COMPLEXITY — HOW IT IS CALCULATED
+The main loop runs from i=2 through i=n.
+Number of iterations = n-1.
+
+Each iteration performs a constant amount of work:
+- two array accesses
+- one addition
+- one assignment
+
+So each iteration costs O(1).
+
+Total:
+T(n) = (n-1) * O(1) + O(1)
+     = O(n)
+
+Therefore, TIME COMPLEXITY = O(n).
+
+SPACE COMPLEXITY
+The dp array stores n+1 values.
+S(n) = O(n).
+
+IMPORTANT
+This is bottom-up Dynamic Programming, also called TABULATION.
+It solves smaller subproblems first and uses their stored answers to solve larger ones.

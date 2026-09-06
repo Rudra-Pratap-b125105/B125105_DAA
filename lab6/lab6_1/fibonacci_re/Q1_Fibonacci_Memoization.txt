@@ -1,0 +1,64 @@
+DAA LAB–6
+Q1. FIBONACCI USING DYNAMIC PROGRAMMING — RECURSION + MEMOIZATION
+
+AIM
+Find the nth Fibonacci number using recursive Dynamic Programming.
+
+IDEA
+Use recursion to express F(n)=F(n-1)+F(n-2), but store every computed result in dp[].
+This is top-down Dynamic Programming, called MEMOIZATION.
+
+PSEUDOCODE
+FIBONACCI(n)
+    if n == 0
+        return 0
+    if n == 1
+        return 1
+
+    if dp[n] != -1
+        return dp[n]
+
+    dp[n] = FIBONACCI(n-1) + FIBONACCI(n-2)
+    return dp[n]
+
+MAIN
+    initialize every dp[i] = -1
+    read n
+    answer = FIBONACCI(n)
+    print answer
+
+
+SAMPLE INPUT
+10
+
+SAMPLE OUTPUT
+The 10th Fibonacci number is 55
+
+TIME COMPLEXITY — HOW IT IS CALCULATED
+There are n+1 possible Fibonacci subproblems:
+F(0), F(1), ..., F(n).
+
+Because of memoization, each F(k) is actually computed at most once.
+After a value is computed, later calls return dp[k] in O(1).
+
+For each newly computed F(k), the work apart from recursive calls is O(1).
+Therefore:
+Number of distinct states = O(n)
+Work per state = O(1)
+
+T(n) = O(n) * O(1)
+     = O(n)
+
+Therefore, TIME COMPLEXITY = O(n).
+
+SPACE COMPLEXITY
+The memoization array uses O(n).
+The recursion stack can also reach depth O(n).
+Total auxiliary space = O(n).
+
+COMPARISON WITH NORMAL RECURSION
+Without dp[], the same recurrence creates repeated calls:
+T(n)=T(n-1)+T(n-2)+O(1),
+which grows exponentially, conventionally written O(2^n).
+
+Memoization removes the repeated subproblems and changes the time to O(n).
