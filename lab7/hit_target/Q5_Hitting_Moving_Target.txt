@@ -1,0 +1,87 @@
+QUESTION 5 — HITTING A MOVING TARGET
+
+Problem
+There are n > 1 hiding spots in a line. The shooter cannot see the target. The
+target moves to an adjacent spot between every two consecutive shots. Design an
+algorithm that guarantees a hit, or prove that this is impossible.
+
+Key idea
+The target's movement preserves the parity relationship between its position and
+the shot number.
+
+A direct strategy is to shoot positions in a sweep:
+    1, 2, 3, ..., n
+and then repeat the sweep after reversing direction.
+
+However, a target can remain forever out of phase with a simple sweep if the
+strategy does not account for parity. The standard solution is to use a parity
+breaking strategy: shoot all positions of one parity in a suitable order, then
+repeat for the other parity. A target changes parity at every move because it moves
+to an adjacent position.
+
+Therefore, if the shooter fires at a position having the same parity as the
+target's position at that shot, a hit can occur. Since the target's parity
+alternates deterministically, the shooter can force a match by using a sweep
+whose shot-position parity changes in the corresponding way.
+
+A particularly simple guaranteed strategy is:
+    shoot 1,2,...,n,1,2,...,n,...
+with the sweep restarted after the target's parity phase is eliminated by changing
+the sweep direction / starting point.
+
+Important caveat
+The exact guarantee depends on whether the target is required to move between
+every pair of shots and whether it may choose either adjacent position at an
+endpoint. Under the usual formulation of this problem, a guaranteed strategy
+exists for n > 1 by using two sweeps with opposite parity phase.
+
+Validation program
+The supplied code in the question is NOT a solution to this problem: it is a
+duplicate of the security-switch program. It must be replaced.
+
+A robust validation program can model all possible target positions after each
+shot.
+Let possible[s] be the set of positions where the target may be immediately before
+shot s.
+
+After shooting position p:
+    if p is in possible, a hit is guaranteed for that branch.
+    Otherwise the target moves to an adjacent position, producing the next
+    possible set.
+
+For a proposed shooting sequence, simulate all possible target positions. If the
+possible set becomes empty because every branch has been hit, the sequence is a
+guaranteed strategy.
+
+Final algorithm for validation
+1. Represent the possible target positions as an n-bit bitset.
+2. Start with all n positions possible.
+3. For every shot position p:
+       remove p from the possible set (those states are hit);
+       move every remaining possible position to its legal adjacent positions.
+4. If no possible position remains before a future shot, the strategy guarantees
+   a hit.
+5. Search candidate strategies (or test a known strategy) until a guarantee is
+   established.
+
+Complexity of validating a fixed sequence
+Using a bitset and O(n) movement per shot:
+    O(L*n)
+for L shots.
+
+With a bitset implementation and word-level operations, movement can be made
+close to O(L) machine-word operations for moderate n.
+
+Space:
+    O(n) for the possible-position representation.
+
+Sample validation output
+Number of hiding spots: 4
+Test sequence: 1 2 3 4 4 3 2 1
+
+Guaranteed hit: YES
+
+Note
+Because the original submitted Q5 C program is actually a copy of Q4, it cannot
+validate the moving-target problem. The code should be rewritten specifically
+for the target-state simulation described above.

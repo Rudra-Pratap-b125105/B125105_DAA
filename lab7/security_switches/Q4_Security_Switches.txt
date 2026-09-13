@@ -1,0 +1,97 @@
+QUESTION 4 — SECURITY SWITCHES
+
+Problem
+There are n switches in a row. The rightmost switch can always be toggled.
+Any other switch can be toggled only when its immediate right switch is ON and
+all switches farther right are OFF. Initially all switches are ON. Find the minimum
+number of toggles needed to turn all switches OFF.
+
+Method
+This is a shortest-path problem over switch configurations.
+
+Represent a configuration by an n-bit integer:
+    1 = ON
+    0 = OFF
+
+There are 2^n possible states. From every state, generate every legal one-switch
+toggle. Each legal toggle has cost 1. Because every edge has equal cost, Breadth-First
+Search (BFS) from the all-ON state to the all-OFF state gives the minimum number
+of moves.
+
+Move validation
+For position i:
+- if it is the rightmost switch, the move is always legal;
+- otherwise its immediate right switch must be ON;
+- every switch farther right must be OFF.
+
+The program stores parent[state] so the minimum sequence can be printed.
+
+Final algorithm
+1. Encode all-ON as (1<<n)-1 and all-OFF as 0.
+2. Start BFS from the all-ON state.
+3. For each state, test every switch.
+4. Generate legal states by toggling one bit.
+5. Record unvisited states and their parents.
+6. Stop when the all-OFF state is reached.
+7. Follow parent pointers backward to print the shortest sequence.
+
+Pseudocode
+BFS(start, goal):
+    enqueue start
+    visited[start] = true
+    parent[start] = -1
+
+    while queue is not empty:
+        state = dequeue
+        if state == goal: break
+
+        for each switch i:
+            if legal(state,i):
+                next = state with bit i toggled
+                if not visited[next]:
+                    visited[next] = true
+                    parent[next] = state
+                    enqueue(next)
+
+    reconstruct path using parent[]
+
+Correctness
+BFS explores states in nondecreasing number of moves from the initial state.
+Therefore the first time the all-OFF state is reached, the path length is minimum.
+
+Complexity
+There are at most 2^n states.
+For each state, up to n switches are examined.
+
+    T(n) = O(n * 2^n)
+
+The legal-move check in the supplied implementation can itself scan to the right,
+so a strict bound for that implementation is:
+
+    T(n) = O(n^2 * 2^n)
+
+If legality is maintained/precomputed per state, it can be reduced to O(n*2^n).
+
+Space:
+Queue + parent + visited + path may each hold O(2^n) states:
+
+    S(n) = O(2^n)
+
+Sample output for n = 3
+Enter number of switches: 3
+
+Security Switches
+-----------------
+Number of switches: 3
+Minimum moves: 7
+
+Step    Switch State
+----    ------------
+0       111
+1       110
+2       100
+3       101
+4       001
+5       011
+6       010
+7       000

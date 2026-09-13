@@ -1,0 +1,50 @@
+Q1. INVERT THE COIN TRIANGLE
+
+Problem:
+Given n rows of coins arranged as an equilateral triangle, invert the triangle using the minimum number of coin moves.
+
+Derivation:
+The total number of coins is
+
+    N = 1 + 2 + ... + n = n(n+1)/2.
+
+To minimize moves, the inverted triangle is positioned so that the maximum possible number of coins overlap with the original triangle. Let k be the optimal shift.
+
+For a shift of k, the coins that do not overlap form three triangular regions. The two side regions contain k(k+1) coins in total, while the remaining triangular region contains
+
+    (n-2k-1)(n-2k)/2
+
+coins.
+
+Hence,
+
+    M(k) = k(k+1) + (n-2k-1)(n-2k)/2.
+
+Comparing consecutive values,
+
+    M(k+1) - M(k) = 6k + 5 - 2n.
+
+The minimum occurs at
+
+    k = floor(n/3).
+
+Substitution and simplification for n mod 3 = 0, 1, or 2 gives the final result:
+
+    M(n) = floor(n(n+1)/6).
+
+Thus, approximately one-third of the coins need to be moved.
+
+Algorithm:
+1. Read n.
+2. Calculate total coins = n(n+1)/2.
+3. Calculate minimum moves = floor(n(n+1)/6).
+4. Display the results.
+
+Complexity:
+Time Complexity: O(1), since only arithmetic operations are performed.
+Space Complexity: O(1), since only a constant number of variables are used.
+
+Example:
+For n = 8:
+Total coins = 8(9)/2 = 36
+Minimum moves = floor(8(9)/6) = 12.

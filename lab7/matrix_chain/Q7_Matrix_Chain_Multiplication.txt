@@ -1,0 +1,83 @@
+QUESTION 7 — MATRIX CHAIN MULTIPLICATION
+
+Problem
+Given matrices A1, A2, ..., An, find the parenthesization that minimizes the number
+of scalar multiplications.
+
+Input representation
+Use an array p[0..n] where matrix Ai has dimensions:
+
+    p[i-1] x p[i]
+
+For example:
+    p = [10,20,30,40]
+means
+    A1 = 10x20
+    A2 = 20x30
+    A3 = 30x40.
+
+Dynamic programming recurrence
+Let m[i][j] be the minimum number of scalar multiplications needed to compute
+Ai...Aj.
+
+Base case:
+    m[i][i] = 0
+
+For i < j, split the chain between Ak and A(k+1):
+
+    m[i][j] =
+        min over i <= k < j {
+            m[i][k] + m[k+1][j] + p[i-1]*p[k]*p[j]
+        }
+
+The last term is the cost of multiplying the two resulting matrices.
+
+The table s[i][j] stores the split k producing the minimum, allowing the optimal
+parenthesization to be reconstructed.
+
+Final algorithm
+1. Set m[i][i] = 0.
+2. Consider chain lengths 2 through n.
+3. For every interval [i,j], try every split k.
+4. Store the minimum cost and its split.
+5. Recursively print parentheses using s[][].
+
+Pseudocode
+MATRIX_CHAIN(p,n):
+    for i = 1..n:
+        m[i][i] = 0
+
+    for length = 2..n:
+        for i = 1..n-length+1:
+            j = i+length-1
+            m[i][j] = infinity
+
+            for k = i..j-1:
+                cost = m[i][k] + m[k+1][j]
+                       + p[i-1]*p[k]*p[j]
+
+                if cost < m[i][j]:
+                    m[i][j] = cost
+                    s[i][j] = k
+
+    return m[1][n]
+
+Complexity derivation
+There are O(n^2) subproblems because every pair (i,j) is considered.
+For each subproblem, up to O(n) split points are examined.
+
+    T(n) = O(n^2) * O(n)
+         = O(n^3)
+
+Space:
+    m and s are n x n tables:
+
+    S(n) = O(n^2)
+
+Sample output
+Enter number of matrices: 3
+Enter dimensions of matrices:
+10 20 30 40
+
+Minimum number of scalar multiplications: 18000
+Optimal parenthesization: ((A1A2)A3)

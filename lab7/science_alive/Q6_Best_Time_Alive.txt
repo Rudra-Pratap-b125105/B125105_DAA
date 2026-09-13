@@ -1,0 +1,65 @@
+QUESTION 6 — THE BEST TIME TO BE ALIVE
+
+Problem
+Given birth and death years for all scientists, find the year in which the maximum
+number of prominent scientists were alive. If one scientist dies in the same year
+another is born, the death happens first.
+
+Method — sweep line / event sorting
+Each scientist produces two events:
+    birth year: +1
+    death year: -1
+
+Sort all events by:
+1. year ascending;
+2. for equal years, death (-1) before birth (+1).
+
+Then scan the events:
+    alive += event.type
+
+Whenever alive exceeds the previous maximum, save that year.
+
+The special tie rule is exactly why death events must come before birth events
+when the years are equal.
+
+Final algorithm
+1. Read n scientists.
+2. Create 2n events.
+3. For each scientist:
+       add (birth,+1)
+       add (death,-1)
+4. Sort events by year, then type.
+5. Scan events while maintaining alive and maxAlive.
+6. Output the year at which maxAlive first occurs.
+
+Correctness
+At every event, alive equals the number of scientists alive immediately after
+that event. Because events are processed chronologically and deaths precede
+same-year births, the required convention is respected.
+
+Complexity derivation
+Creating events:
+    O(n)
+
+Sorting 2n events:
+    O((2n) log(2n)) = O(n log n)
+
+Scanning:
+    O(2n) = O(n)
+
+Therefore:
+    T(n) = O(n log n)
+
+Space:
+    2n Event records are stored:
+    S(n) = O(n)
+
+Sample output
+Enter number of scientists: 4
+Enter birth and death year of scientist 1: 1500 1550
+Enter birth and death year of scientist 2: 1520 1580
+Enter birth and death year of scientist 3: 1540 1570
+Enter birth and death year of scientist 4: 1580 1600
+
+Maximum number of scientists alive: 3
+Time when maximum occurs: 1540

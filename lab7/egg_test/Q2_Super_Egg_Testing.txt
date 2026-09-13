@@ -1,0 +1,82 @@
+QUESTION 2 — SUPER EGG TESTING EXPERIMENT
+
+Problem
+Given E identical eggs and F floors, determine the minimum number of droppings
+needed in the worst case to identify the highest safe floor.
+
+Dynamic programming idea
+Let dp[e][f] be the minimum number of drops needed with e eggs and f floors.
+
+Suppose the next egg is dropped from floor x.
+
+Two cases are possible:
+1. Egg breaks:
+       e - 1 eggs and x - 1 lower floors remain.
+   Cost = dp[e-1][x-1].
+2. Egg survives:
+       e eggs and f - x higher floors remain.
+   Cost = dp[e][f-x].
+
+Because we need a guarantee, take the worse case:
+    max(dp[e-1][x-1], dp[e][f-x])
+
+The current drop itself adds 1. We try every possible x and choose the best:
+    dp[e][f] =
+        1 + min over x=1..f of
+            max(dp[e-1][x-1], dp[e][f-x])
+
+Base cases
+    dp[e][0] = 0
+    dp[e][1] = 1
+    dp[1][f] = f
+
+For the stated publicity problem:
+    E = 2, F = 100
+The answer is 14 drops.
+
+Final algorithm
+1. Create a DP table dp[E+1][F+1].
+2. Initialize the base cases.
+3. For e = 2..E:
+       for f = 2..F:
+           try every floor x from 1..f.
+           compute the worst-case cost.
+           keep the minimum.
+4. Return dp[E][F].
+
+Pseudocode
+EGG_DROP(E,F):
+    initialize dp
+    for e = 1..E:
+        dp[e][0] = 0
+        dp[e][1] = 1
+    for f = 1..F:
+        dp[1][f] = f
+
+    for e = 2..E:
+        for f = 2..F:
+            dp[e][f] = infinity
+            for x = 1..f:
+                cost = 1 + max(dp[e-1][x-1], dp[e][f-x])
+                dp[e][f] = min(dp[e][f], cost)
+
+    return dp[E][F]
+
+Complexity derivation
+There are E*F DP states. For each state, all f possible dropping
+floors may be tested. Therefore:
+
+    T(E,F) = sum(e=2..E) sum(f=2..F) O(f)
+           = O(E * F^2)
+
+Space:
+    The table contains (E+1)(F+1) entries:
+    S(E,F) = O(EF)
+
+Sample output
+Enter number of eggs: 2
+Enter number of floors: 100
+
+Number of eggs   : 2
+Number of floors : 100
+Minimum drops    : 14
