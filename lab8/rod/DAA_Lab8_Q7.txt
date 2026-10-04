@@ -1,0 +1,104 @@
+DAA LAB 8 - QUESTION 7
+ROD CUTTING WITH RECONSTRUCTION
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+Given a rod of length n and prices p[1..n], where p[i] is the price of a piece of length i, determine the maximum revenue obtainable by cutting the rod. Also display the exact piece lengths used.
+
+Each piece length may be used multiple times.
+
+2. APPROACH
+Dynamic Programming is used.
+
+Let:
+dp[i] = maximum revenue obtainable from a rod of length i.
+
+For every possible first cut j:
+dp[i] = max(dp[i], price[j] + dp[i-j])
+
+To reconstruct the cuts:
+cut[i] = length of the first piece selected for the optimal solution of length i.
+
+3. EXAMPLE
+Prices:
+Length:  1  2  3  4  5  6  7  8
+Price:   1  5  8  9 10 17 17 20
+
+For length 8, an optimal solution is:
+2 + 6
+
+Revenue:
+price[2] + price[6]
+= 5 + 17
+= 22
+
+Maximum revenue = 22.
+
+4. SAMPLE INPUT
+Rod length: 8
+Prices:
+1 5 8 9 10 17 17 20
+
+5. SAMPLE OUTPUT
+Maximum Revenue: 22
+Cuts: 2 6
+
+The order 6 2 represents the same physical cutting solution.
+
+6. PSEUDOCODE
+
+ROD-CUTTING(price, n)
+
+    dp[0] = 0
+    cut[0] = 0
+
+    for i = 1 to n
+
+        dp[i] = price[i]
+        cut[i] = i
+
+        for j = 1 to i
+
+            if price[j] + dp[i-j] > dp[i]
+                dp[i] = price[j] + dp[i-j]
+                cut[i] = j
+
+    length = n
+
+    while length > 0
+        print cut[length]
+        length = length - cut[length]
+
+    return dp[n]
+
+7. TIME COMPLEXITY
+For every rod length i, all possible first cuts j = 1..i are considered.
+
+Number of iterations:
+1 + 2 + ... + n
+= n(n+1)/2
+
+Therefore:
+T(DP) = Theta(n^2)
+
+Reconstruction takes O(n) in the worst case.
+
+Overall:
+Theta(n^2)
+
+8. SPACE COMPLEXITY
+dp[] = O(n)
+cut[] = O(n)
+price[] = O(n)
+
+Auxiliary DP space:
+O(n)
+
+Total allocated space:
+O(n)
+
+9. IMPORTANT POINTS
+- A rod can be divided into any number of pieces.
+- The same piece length can be selected multiple times.
+- cut[] is required for reconstruction.
+- Without cut[], dp[] can find the maximum revenue but cannot directly tell us which cuts produced it.

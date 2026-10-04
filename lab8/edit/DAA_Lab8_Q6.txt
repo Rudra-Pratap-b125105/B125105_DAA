@@ -1,0 +1,161 @@
+DAA LAB 8 - QUESTION 6
+EDIT DISTANCE WITH TRACEBACK
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+Given two strings A and B, find the minimum number of operations required to convert A into B.
+
+Allowed operations:
+1. Insert a character.
+2. Delete a character.
+3. Substitute one character with another.
+
+The program also performs traceback and displays the operations used.
+
+2. APPROACH
+Dynamic Programming is used.
+
+Let:
+dp[i][j] = minimum number of operations required to convert the first i characters of A into the first j characters of B.
+
+Base cases:
+dp[i][0] = i
+dp[0][j] = j
+
+If A[i-1] == B[j-1]:
+    dp[i][j] = dp[i-1][j-1]
+
+Otherwise:
+dp[i][j] = 1 + min(
+    dp[i-1][j],       deletion
+    dp[i][j-1],       insertion
+    dp[i-1][j-1]      substitution
+)
+
+3. TRACEBACK
+Start from dp[m][n].
+
+If the current characters are equal:
+    move diagonally.
+
+Otherwise:
+- If dp[i][j] = dp[i-1][j] + 1, the operation is deletion.
+- If dp[i][j] = dp[i][j-1] + 1, the operation is insertion.
+- Otherwise, the operation is substitution.
+
+Traceback moves from the end toward the beginning, so operations are stored and printed in reverse order.
+
+4. SAMPLE INPUT
+First string:
+kitten
+
+Second string:
+sitting
+
+5. SAMPLE OUTPUT
+Minimum Edit Distance: 3
+
+Traceback:
+Substitute 'k' with 's'
+Keep 'i'
+Keep 't'
+Keep 't'
+Substitute 'e' with 'i'
+Keep 'n'
+Insert 'g'
+
+One possible conversion:
+kitten
+  -> sitten
+  -> sittin
+  -> sitting
+
+Therefore:
+Edit Distance = 3
+
+6. PSEUDOCODE
+
+EDIT-DISTANCE(A, B)
+
+    m = length(A)
+    n = length(B)
+
+    for i = 0 to m
+        dp[i][0] = i
+
+    for j = 0 to n
+        dp[0][j] = j
+
+    for i = 1 to m
+        for j = 1 to n
+
+            if A[i-1] == B[j-1]
+                dp[i][j] = dp[i-1][j-1]
+
+            else
+                insert = dp[i][j-1] + 1
+                delete = dp[i-1][j] + 1
+                substitute = dp[i-1][j-1] + 1
+
+                dp[i][j] = minimum(insert,
+                                   delete,
+                                   substitute)
+
+    return dp[m][n]
+
+TRACEBACK
+
+    i = m
+    j = n
+
+    while i > 0 or j > 0
+
+        if i > 0 and j > 0 and A[i-1] == B[j-1]
+            record KEEP
+            i--
+            j--
+
+        else if i > 0 and dp[i][j] == dp[i-1][j] + 1
+            record DELETE
+            i--
+
+        else if j > 0 and dp[i][j] == dp[i][j-1] + 1
+            record INSERT
+            j--
+
+        else
+            record SUBSTITUTE
+            i--
+            j--
+
+    reverse recorded operations
+
+7. TIME COMPLEXITY
+There are (m+1)(n+1) DP cells.
+
+Each cell takes constant time.
+
+Therefore:
+T(DP) = Theta(mn)
+
+Traceback performs at most m+n moves:
+T(traceback) = O(m+n)
+
+Overall:
+Theta(mn)
+
+8. SPACE COMPLEXITY
+DP table:
+O(mn)
+
+Traceback storage:
+O(m+n)
+
+Therefore, the DP table dominates:
+O(mn)
+
+9. IMPORTANT POINTS
+- Insert, delete, and substitute each have cost 1.
+- If the current characters match, no new operation is needed.
+- There can be multiple equally optimal edit sequences.
+- Traceback identifies one optimal sequence of operations.

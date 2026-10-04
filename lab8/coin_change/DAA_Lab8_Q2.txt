@@ -1,0 +1,119 @@
+DAA LAB 8 - QUESTION 2
+COIN CHANGE: TOTAL NUMBER OF COMBINATIONS
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+Given distinct positive coin denominations C = {c1, c2, ..., cn} with unlimited supply and a target amount V, find the total number of different combinations that make V. The order of coins does not matter.
+
+2. OBJECTIVE
+Calculate the number of combinations and display all valid combinations.
+
+3. APPROACH
+Dynamic Programming is used to count combinations.
+
+Let:
+dp[x] = number of combinations that make amount x using the coins processed so far.
+
+Initialize:
+dp[0] = 1
+
+For each coin c:
+    for amount = c to V:
+        dp[amount] += dp[amount-c]
+
+The coin loop is placed outside the amount loop. This ensures that different orders of the same coins are not counted separately.
+
+Example:
+Coins = {1,2}, V = 3
+
+Valid combinations:
+1+1+1
+1+2
+
+The sequence 2+1 is not counted separately.
+
+4. ALGORITHM
+1. Set dp[0] = 1 and all other dp values to 0.
+2. For every coin c:
+   a. For amount from c to V:
+      dp[amount] += dp[amount-c].
+3. dp[V] gives the total number of combinations.
+4. To display combinations, use recursive enumeration:
+   a. Keep a starting coin index.
+   b. Choose coins only from that index onward.
+   c. Pass the same index after selecting a coin because unlimited supply is allowed.
+   d. When remaining amount becomes 0, print the combination.
+
+5. SAMPLE INPUT
+Number of coin denominations: 3
+Coins: 1 2 5
+Target amount: 5
+
+6. SAMPLE OUTPUT
+Total number of combinations: 4
+
+Combinations:
+1 1 1 1 1
+1 1 1 2
+1 2 2
+5
+
+7. PSEUDOCODE - COUNTING
+
+COUNT-WAYS(C, n, V)
+
+    dp[0] = 1
+
+    for i = 1 to V
+        dp[i] = 0
+
+    for i = 0 to n-1
+        for amount = C[i] to V
+            dp[amount] = dp[amount] + dp[amount-C[i]]
+
+    return dp[V]
+
+8. PSEUDOCODE - PRINTING COMBINATIONS
+
+PRINT-COMBINATIONS(C, n, remaining, start)
+
+    if remaining = 0
+        print current combination
+        return
+
+    for i = start to n-1
+        if C[i] <= remaining
+            add C[i] to current combination
+            PRINT-COMBINATIONS(C, n, remaining-C[i], i)
+            remove C[i] from current combination
+
+9. TIME COMPLEXITY
+Counting:
+For each of n coins, amounts from the coin value through V are examined.
+
+Worst case:
+n * V
+
+Therefore:
+T(counting) = Theta(nV)
+
+If W valid combinations are printed and their average length is at most V, enumeration can require O(WV) time in the worst case.
+
+Therefore:
+T(total) = O(nV + WV)
+
+10. SPACE COMPLEXITY
+The DP array requires O(V).
+
+The temporary combination can contain at most V coins when denomination 1 is present, so it requires O(V).
+
+The recursion depth is also at most O(V).
+
+Including the input array:
+O(n + V)
+
+11. IMPORTANT POINTS
+- The order of coins does not matter.
+- Coin-first DP avoids counting permutations multiple times.
+- The same coin index is passed during recursion because coins have unlimited supply.
+- Counting and printing are separate tasks: DP counts efficiently, while enumeration may take much longer.

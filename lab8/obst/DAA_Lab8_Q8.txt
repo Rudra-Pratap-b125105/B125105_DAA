@@ -1,0 +1,153 @@
+DAA LAB 8 - QUESTION 8
+OPTIMAL BINARY SEARCH TREE (OBST)
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+Given n sorted keys K1, K2, ..., Kn:
+
+p[i] = probability/frequency of a successful search for key Ki.
+
+q[i] = probability/frequency of an unsuccessful search between keys.
+
+Find a Binary Search Tree with minimum expected search cost.
+
+2. NOTATION
+For keys i through j:
+
+e[i][j] = minimum expected search cost of the subtree containing keys i..j.
+
+w[i][j] = total probability/frequency associated with the interval.
+
+root[i][j] = key selected as the optimal root for that interval.
+
+3. BASE CASE
+For an empty subtree:
+
+e[i][i-1] = q[i-1]
+w[i][i-1] = q[i-1]
+
+4. WEIGHT RECURRENCE
+The total weight is:
+
+w[i][j] = w[i][j-1] + p[j] + q[j]
+
+5. COST RECURRENCE
+Try every key r from i through j as the root.
+
+e[i][j] =
+min over r=i..j {
+    e[i][r-1] + e[r+1][j] + w[i][j]
+}
+
+The w[i][j] term is added because all searches in the resulting subtrees move one level deeper when a root is selected.
+
+6. ALGORITHM
+1. Initialize empty-subtree costs using q values.
+2. Process subtrees in increasing order of length.
+3. For every interval [i,j]:
+   a. Compute its weight.
+   b. Set its cost to infinity.
+   c. Try each possible root r.
+   d. Compute the cost for choosing r.
+   e. Store the minimum cost and corresponding root.
+4. The final minimum expected cost is e[1][n].
+5. Use root[][] recursively to reconstruct the tree.
+
+7. SAMPLE INPUT FORMAT
+Number of keys: 3
+
+Successful frequencies/probabilities p[1..3]:
+3 3 1
+
+Unsuccessful frequencies/probabilities q[0..3]:
+2 3 1 1
+
+8. OUTPUT CONTENT
+The program reports:
+- Minimum expected search cost.
+- Root of the optimal tree.
+- Left and right child relationships.
+- Root table for the computed intervals.
+
+Note: The values p and q may represent probabilities or integer frequencies. If actual probabilities are used, the cost is interpreted accordingly. If integer frequencies are used, the resulting value is a weighted search-cost measure rather than a normalized probability expectation.
+
+9. PSEUDOCODE
+
+OPTIMAL-BST(p, q, n)
+
+    for i = 1 to n+1
+        e[i][i-1] = q[i-1]
+        w[i][i-1] = q[i-1]
+
+    for length = 1 to n
+
+        for i = 1 to n-length+1
+
+            j = i + length - 1
+
+            e[i][j] = infinity
+
+            w[i][j] = w[i][j-1] + p[j] + q[j]
+
+            for r = i to j
+
+                cost = e[i][r-1]
+                     + e[r+1][j]
+                     + w[i][j]
+
+                if cost < e[i][j]
+
+                    e[i][j] = cost
+                    root[i][j] = r
+
+    return e[1][n]
+
+10. TREE RECONSTRUCTION PSEUDOCODE
+
+PRINT-TREE(root, i, j, parent)
+
+    if i > j
+        return
+
+    r = root[i][j]
+
+    print r as a child of parent
+
+    PRINT-TREE(root, i, r-1, r)
+    PRINT-TREE(root, r+1, j, r)
+
+11. TIME COMPLEXITY
+For each subtree length, we examine all possible intervals and then all possible roots.
+
+The total number of root evaluations is:
+
+sum from l=1 to n of (n-l+1)l
+
+This is Theta(n^3).
+
+Therefore:
+T(DP) = Theta(n^3)
+
+Tree reconstruction takes O(n).
+
+Overall:
+Theta(n^3)
+
+12. SPACE COMPLEXITY
+e[][] = O(n^2)
+w[][] = O(n^2)
+root[][] = O(n^2)
+
+Therefore:
+O(n^2)
+
+13. IMPORTANT/VIVA POINTS
+- OBST is a dynamic-programming problem.
+- Keys must be sorted.
+- p values correspond to successful searches.
+- q values correspond to unsuccessful searches.
+- e[][] stores minimum costs.
+- w[][] stores interval weights.
+- root[][] stores reconstruction information.
+- Standard OBST DP has Theta(n^3) time and O(n^2) space.
+- If probabilities are normalized, their total should satisfy the probability model being used.

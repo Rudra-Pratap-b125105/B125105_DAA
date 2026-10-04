@@ -1,0 +1,218 @@
+DAA LAB 8 - QUESTION 9
+COLLATZ CONJECTURE
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+The Collatz process starts with a positive integer n and repeatedly applies:
+
+If n is even:
+    n = n / 2
+
+If n is odd:
+    n = 3n + 1
+
+The Collatz Conjecture states that every positive integer eventually reaches 1.
+
+The program is an experimental verifier only. It does not prove the conjecture.
+
+The program must:
+- Accept a starting value n.
+- Accept an interval [a,b].
+- Generate and display the Collatz sequence for n.
+- Analyze every value in [a,b].
+- Use iterative control.
+- Use functional decomposition.
+- Use dynamic memory and pointers.
+- Handle integer overflow safely.
+
+2. FUNCTIONAL DECOMPOSITION
+The program is divided into modular functions:
+
+isEven(n)
+    Checks whether n is even.
+
+nextCollatz(n, *next)
+    Calculates the next value and reports whether the operation would overflow.
+
+generateSequence(n, *length, *overflow)
+    Dynamically stores the entire sequence.
+
+printSequence(sequence, length)
+    Displays the sequence.
+
+analyzeNumber(n)
+    Generates and analyzes the sequence for one starting value.
+
+analyzeRange(a,b)
+    Processes every starting value in the interval.
+
+main()
+    Reads input and controls the program.
+
+3. ITERATIVE CONTROL
+The sequence generation uses a while loop rather than recursion.
+
+This is preferable because Collatz sequences can become long, and recursion could consume large amounts of stack space.
+
+4. DYNAMIC MEMORY
+The sequence length is not known in advance.
+
+The program therefore:
+1. Allocates an initial dynamic array.
+2. Stores generated values.
+3. Doubles the capacity when the array becomes full.
+4. Uses realloc() to resize the array.
+5. Frees the memory after analysis.
+
+5. POINTER USAGE
+Pointers are used for multiple-output functions.
+
+For example, nextCollatz() uses a pointer to return the next value while its return value indicates whether the operation was successful.
+
+generateSequence() also uses pointers to return:
+- sequence length
+- overflow status
+
+6. INTEGER OVERFLOW HANDLING
+The dangerous operation for an odd value is:
+
+3n + 1
+
+Before calculating it, the program checks whether n is greater than:
+
+(ULLONG_MAX - 1) / 3
+
+If this condition holds, 3n+1 would exceed the maximum unsigned long long value.
+
+The program then stops safely and reports overflow instead of allowing an invalid computation.
+
+This is important because relying on integer wraparound would produce an incorrect Collatz sequence.
+
+7. SAMPLE INPUT
+Starting number n:
+13
+
+Interval [a b]:
+10 15
+
+8. SAMPLE OUTPUT
+Starting number: 13
+
+Sequence:
+13 -> 40 -> 20 -> 10 -> 5 -> 16 -> 8 -> 4 -> 2 -> 1
+
+Number of terms: 10
+Steps to reach 1: 9
+
+Collatz Analysis for [10, 15]
+
+10: 6 steps
+11: 14 steps
+12: 9 steps
+13: 9 steps
+14: 17 steps
+15: 17 steps
+
+9. PSEUDOCODE - NEXT VALUE
+
+NEXT-COLLATZ(n)
+
+    if n is even
+        next = n / 2
+        return success
+
+    if 3n + 1 would overflow
+        return overflow
+
+    next = 3n + 1
+    return success
+
+10. PSEUDOCODE - GENERATING A SEQUENCE
+
+GENERATE-SEQUENCE(n)
+
+    allocate dynamic array
+    length = 0
+
+    while true
+
+        store n
+        length++
+
+        if n == 1
+            break
+
+        calculate next value
+
+        if overflow
+            stop safely
+
+        n = next
+
+    return sequence
+
+11. PSEUDOCODE - RANGE ANALYSIS
+
+ANALYZE-RANGE(a, b)
+
+    if a > b
+        swap a and b
+
+    for n = a to b
+
+        sequence = GENERATE-SEQUENCE(n)
+
+        print number of steps or overflow status
+
+        free sequence
+
+12. TIME COMPLEXITY
+Let L(n) be the number of Collatz steps needed for n to reach 1.
+
+For one starting value, every generated term requires constant work.
+
+Therefore:
+
+T(n) = O(L(n))
+
+For an interval [a,b]:
+
+T(a,b) =
+O(sum of L(k), for k = a to b)
+
+The Collatz Conjecture does not currently provide a known general polynomial upper bound for L(n).
+
+Therefore it is not appropriate to state a fixed complexity such as O(n^2) for the sequence generation.
+
+13. SPACE COMPLEXITY
+For one generated sequence, all terms are stored.
+
+Therefore:
+S(n) = O(L(n))
+
+For the interval, only one sequence is stored at a time.
+
+Peak auxiliary space:
+O(max L(k), for k in [a,b])
+
+14. IMPORTANT/VIVA POINTS
+- The program tests the conjecture experimentally; it does not prove it.
+- Iteration is used instead of recursion to avoid excessive call-stack usage.
+- Dynamic memory is needed because sequence length is unknown beforehand.
+- realloc() allows the sequence array to grow.
+- Pointers allow functions to return multiple pieces of information.
+- Overflow checking is necessary before computing 3n+1.
+- Unsigned long long is used to provide a large integer range.
+- A positive starting value is required.
+- If the interval is entered in reverse order, the program can swap the endpoints.
+- Memory allocated for each sequence must be freed after use.
+
+15. DOCUMENTATION SUMMARY
+The program demonstrates:
+1. Iterative control structures.
+2. Modular functional decomposition.
+3. Dynamic memory allocation.
+4. Pointer-based parameter passing.
+5. Runtime array resizing.
+6. Integer overflow detection.
+7. Experimental analysis of the Collatz process.

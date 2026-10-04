@@ -1,0 +1,116 @@
+DAA LAB 8 - QUESTION 1
+MINIMUM COIN CHANGE
+Documentation (Code Excluded)
+
+1. PROBLEM STATEMENT
+Given an integer array of coin denominations C = {c1, c2, ..., cn} and a target amount V, find the minimum number of coins required to make exactly V. Each denomination has an unlimited supply. If V cannot be formed, return -1.
+
+2. OBJECTIVE
+Find the minimum number of coins needed and reconstruct/display the actual coins selected.
+
+3. APPROACH
+Dynamic Programming is used.
+
+Let:
+dp[x] = minimum number of coins required to make amount x.
+
+Base case:
+dp[0] = 0
+
+For every amount x from 1 to V, try every coin c <= x. If x-c is reachable:
+dp[x] = min(dp[x], dp[x-c] + 1)
+
+A choice[x] array stores the coin selected when dp[x] is improved. This allows reconstruction of the actual solution.
+
+4. ALGORITHM
+1. Initialize dp[0] = 0.
+2. Initialize all other dp values to infinity/unreachable.
+3. For amount x = 1 to V:
+   a. For every coin c:
+      i. If c <= x and dp[x-c] is reachable, calculate dp[x-c] + 1.
+      ii. If this is smaller than dp[x], update dp[x].
+      iii. Store c in choice[x].
+4. If dp[V] is unreachable, report -1.
+5. Otherwise, start from V and repeatedly:
+   a. Print choice[V].
+   b. Subtract choice[V] from V.
+6. Continue until the remaining amount becomes 0.
+
+5. RECONSTRUCTION
+The choice array stores the last coin selected for every amount.
+
+Example:
+Coins = {1, 3, 4}, V = 6
+
+An optimal solution is:
+3 + 3 = 6
+
+Minimum number of coins = 2.
+
+6. SAMPLE INPUT
+Number of coin denominations: 3
+Coins: 1 3 4
+Target amount: 6
+
+7. SAMPLE OUTPUT
+Minimum number of coins: 2
+Selected coins: 3 3
+
+8. PSEUDOCODE
+MINIMUM-COIN-CHANGE(C, n, V)
+
+    dp[0] = 0
+    choice[0] = -1
+
+    for x = 1 to V
+        dp[x] = infinity
+        choice[x] = -1
+
+        for each coin c in C
+            if c <= x and dp[x-c] is not infinity
+                if dp[x-c] + 1 < dp[x]
+                    dp[x] = dp[x-c] + 1
+                    choice[x] = c
+
+    if dp[V] is infinity
+        return -1
+
+    amount = V
+
+    while amount > 0
+        print choice[amount]
+        amount = amount - choice[amount]
+
+    return dp[V]
+
+9. TIME COMPLEXITY
+For every amount from 1 to V, all n denominations are examined.
+
+Number of iterations:
+V * n
+
+Therefore:
+T(V,n) = Theta(nV)
+
+Reconstruction takes at most V iterations in the worst case, so:
+T(reconstruction) = O(V)
+
+Overall:
+Theta(nV) + O(V) = Theta(nV)
+
+10. SPACE COMPLEXITY
+dp[] requires O(V).
+choice[] requires O(V).
+The coin array requires O(n).
+
+Auxiliary DP space:
+O(V)
+
+Total allocated space:
+O(n + V)
+
+11. IMPORTANT POINTS
+- Unlimited supply of every coin is allowed.
+- The order of selected coins does not matter for the minimum count.
+- If no combination forms V, the answer is -1.
+- choice[] is needed to display the selected coins.
