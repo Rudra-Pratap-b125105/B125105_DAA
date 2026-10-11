@@ -1,0 +1,188 @@
+Q1 — Fractional Knapsack with Deterioration Rate
+
+Suggested filename: Q1_Fractional_Knapsack_with_Deterioration_Rate.txt
+1. Problem understanding
+
+In the standard fractional knapsack problem, we are given items with weights and values, along with a knapsack capacity. We may take a fraction of an item, rather than being restricted to taking the entire item.
+
+The objective is to maximize the total value without exceeding the capacity.
+
+With deterioration, an item's value density can decrease over time. Therefore, its usefulness may depend on both its original value and the amount of deterioration it experiences.
+
+Let:
+
+- w_i = weight of item i
+- v_i = initial value of item i
+- lambda_i = deterioration rate of item i
+- x_i = amount of item i selected
+- W = total knapsack capacity
+
+The capacity constraint is
+
+sum_i=1^nx_i<= W, 0<= x_i<= w_i 
+
+A deterioration model must be specified before deciding which greedy strategy is optimal. Different models can produce different optimal choices.
+2. Approach
+
+For the ordinary fractional knapsack problem, calculate the value-to-weight ratio of every item:
+
+rho_i=(v_i)/(w_i) 
+
+Sort the items in decreasing order of rho_i, select as much as possible from the highest-ratio item, and continue until the capacity is full.
+
+This greedy strategy is optimal for the standard fractional knapsack problem because every unit of capacity assigned to a lower-value-density item could instead be assigned to a higher-value-density item.
+
+With deterioration, however, the effective value density may change over time. Simply sorting by initial value density does not necessarily remain optimal.
+
+For a possible linear deterioration model,
+
+d_i(t)=(v_i)/(w_i)-lambda_i t 
+
+the density at time t decreases linearly. An implementation must define when selection occurs, how deterioration is applied, and whether an item's value can become negative. The algorithm below demonstrates the standard fractional-knapsack greedy procedure; the deterioration-specific rule must be adapted to the exact lab specification.
+3. Algorithm
+
+1. Read the number of items and the knapsack capacity.
+2. Read the weight and value of each item.
+3. Calculate each item's value-to-weight ratio.
+4. Sort the items in descending order of this ratio.
+5. Initialize the remaining capacity and total value to zero and the full capacity, respectively.
+6. For each item:
+- If the entire item fits, take it completely.
+- Otherwise, take only the fraction that fits.
+- Update the remaining capacity and total value.
+7. Stop when the knapsack is full or all items have been considered.
+8. Display the selected fractions and total value.
+4. Pseudocode
+
+FRACTIONAL-KNAPSACK(items, W):
+for each item i:
+ratio[i] = value[i] / weight[i]
+
+sort items by decreasing ratio
+
+totalValue = 0
+remaining = W
+
+for each item i:
+if remaining == 0:
+break
+
+take = min(weight[i], remaining)
+fraction = take / weight[i]
+
+totalValue = totalValue + fraction * value[i]
+remaining = remaining - take
+
+record fraction selected
+
+return totalValue and selected fractions
+
+5. Sample input
+
+Number of items: 3
+Knapsack capacity: 50
+
+Item 1: Weight = 10, Value = 60
+Item 2: Weight = 20, Value = 100
+Item 3: Weight = 30, Value = 120
+
+6. Sample output
+
+Selected items:
+Item 1: 100%
+Item 2: 100%
+Item 3: 66.67%
+
+Maximum total value: 240.00
+
+7. Dry run
+
+First, calculate the value-to-weight ratio:
+
+| Item | Weight | Value | Ratio |
+| ---- | ------ | ----- | ----- |
+| 1 | 10 | 60 | 6 |
+| 2 | 20 | 100 | 5 |
+| 3 | 30 | 120 | 4 |
+
+The items are already sorted in decreasing order of ratio.
+
+Step 1: Select Item 1
+
+- Remaining capacity: 50
+- Item weight: 10
+- The entire item fits.
+- Value gained: 60
+
+Remaining capacity:
+
+50-10=40 
+
+Total value: 60.
+
+Step 2: Select Item 2
+
+- Remaining capacity: 40
+- Item weight: 20
+- The entire item fits.
+- Value gained: 100
+
+Remaining capacity:
+
+40-20=20 
+
+Total value:
+
+60+100=160 
+
+Step 3: Select Item 3
+
+Only 20 units of capacity remain, while Item 3 weighs 30.
+
+The fraction selected is
+
+(20)/(30)=frac23 
+
+Value gained:
+
+120xfrac23=80 
+
+Total value:
+
+160+80=240 
+
+The capacity is now full, and the maximum value for this standard fractional-knapsack example is 240.
+8. Time complexity derivation
+
+Let n be the number of items.
+
+- Calculating all value-to-weight ratios takes O(n).
+- Sorting the items takes O(nlog n).
+- Traversing the sorted items takes at most O(n).
+
+Therefore,
+
+T(n)=O(n)+O(nlog n)+O(n) 
+
+The sorting term dominates:
+
+T(n)=O(nlog n) 
+
+If the items are already sorted by ratio, the selection pass takes O(n).
+9. Space complexity derivation
+
+If the input items are stored in an array, the storage is O(n). An in-place sorting algorithm may require additional stack space, depending on its implementation.
+
+- Item storage: O(n)
+- Ratio storage, if kept separately: O(n)
+- Selection traversal: O(1) auxiliary variables
+
+With arrays and stored ratios, the total space is
+
+S(n)=O(n)+O(n)+O(1) 
+
+Hence,
+
+S(n)=O(n) 
+
+Conclusion: The ordinary fractional-knapsack greedy strategy is optimal under fixed value densities. For the deterioration variant, the precise value-decay formula and timing assumptions must be established before claiming that a particular greedy ordering is optimal.

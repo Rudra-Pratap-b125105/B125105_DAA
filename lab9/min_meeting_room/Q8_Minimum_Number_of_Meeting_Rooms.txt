@@ -1,0 +1,147 @@
+Q8 — Minimum Number of Meeting Rooms
+
+Suggested filename: Q8_Minimum_Number_of_Meeting_Rooms.txt
+1. Problem understanding
+
+Given the start and end times of n meetings, determine the minimum number of rooms required to hold all meetings without conflicts.
+
+Two meetings can use the same room if one meeting ends before or exactly when the next meeting starts. In this documentation, meeting intervals are treated as half-open intervals, so a meeting ending at time t does not conflict with another starting at time t.
+
+For example, meetings [0,10] and [10,20] can share a room.
+
+The minimum number of rooms equals the maximum number of meetings that overlap at any point in time.
+2. Approach
+
+Sort meetings by their start times. Use a min-heap to store the ending times of meetings currently assigned to rooms.
+
+The smallest ending time is at the top of the heap because that room becomes available first.
+
+For each meeting:
+
+1. Remove every ending time that is less than or equal to the new meeting's start time.
+2. Add the new meeting's ending time.
+3. Track the maximum heap size observed.
+
+The maximum heap size is the minimum number of rooms needed.
+3. Algorithm
+
+1. Read all meetings as (start, end) pairs.
+2. Sort meetings by increasing start time.
+3. Create an empty min-heap for room ending times.
+4. Initialize the maximum room count to zero.
+5. For each meeting:
+- Remove all heap entries whose end time is at most the meeting's start time.
+- Insert the current meeting's end time.
+- Update the maximum heap size.
+6. Return the maximum heap size.
+4. Pseudocode
+
+MINIMUM-ROOMS(meetings):
+sort meetings by increasing start time
+
+create empty min-heap of ending times
+maximumRooms = 0
+
+for each meeting (start, end):
+while heap is not empty
+and minimum(heap) <= start:
+extract minimum from heap
+
+insert end into heap
+
+maximumRooms = max(
+maximumRooms,
+heap size
+)
+
+return maximumRooms
+
+5. Sample input
+
+Number of meetings: 3
+
+Meeting 1: 0 30
+Meeting 2: 5 10
+Meeting 3: 15 20
+
+6. Sample output
+
+Minimum number of meeting rooms: 2
+
+7. Dry run
+
+The meetings are already sorted by start time.
+
+| Meeting | Start | End |
+| ------- | ----- | --- |
+| 1 | 0 | 30 |
+| 2 | 5 | 10 |
+| 3 | 15 | 20 |
+
+Initially, the heap is empty.
+
+Meeting 1: [0,30]
+
+No room is occupied yet. Insert end time 30.
+
+Heap:
+
+[30] 
+
+Room count: 1.
+
+Meeting 2: [5,10]
+
+The earliest ending time is 30. Since 30>5, the first meeting has not finished.
+
+A second room is required. Insert end time 10.
+
+Heap:
+
+[10,30] 
+
+Room count: 2.
+
+Meeting 3: [15,20]
+
+The earliest ending time is 10. Since 10<=15, that room is free, so remove 10.
+
+The remaining heap contains 30. Since 30>15, the first meeting is still running.
+
+Insert end time 20.
+
+Heap:
+
+[20,30] 
+
+Room count: 2.
+
+The maximum heap size throughout the algorithm is 2, so two rooms are sufficient.
+8. Time complexity derivation
+
+Let n be the number of meetings.
+
+- Sorting the meetings takes O(nlog n).
+- Each meeting is inserted into the heap once, costing O(log n).
+- Each meeting's ending time is removed at most once, costing O(log n) per removal.
+
+Across all meetings, there are at most n insertions and n removals. Thus, the heap operations take O(nlog n).
+
+Therefore,
+
+T(n)=O(nlog n)+O(nlog n) 
+
+Hence,
+
+T(n)=O(nlog n) 
+9. Space complexity derivation
+
+- The sorted meeting array requires O(n) storage if copied.
+- The min-heap can contain up to n ending times, requiring O(n).
+- The counters and temporary variables require O(1).
+
+Thus, including the meeting data,
+
+S(n)=O(n) 
+
+Conclusion: Sorting by start time and using a min-heap of ending times allows the minimum number of rooms to be calculated in O(nlog n) time.

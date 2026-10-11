@@ -1,0 +1,218 @@
+Q10 — Greedy Superstring Algorithm
+
+Suggested filename: Q10_Greedy_Superstring_Conjecture.txt
+1. Problem understanding
+
+Given a collection of strings, the shortest common superstring problem asks us to find the shortest string that contains every input string as a substring.
+
+For example, the strings ABC, BCD, and CDE can all be represented by the single string ABCDE.
+
+The greedy approach repeatedly chooses the two strings with the largest suffix-prefix overlap and merges them. This produces a shorter combined string whenever the strings share an overlap.
+
+However, the greedy method is a heuristic: in general, choosing the largest overlap at each step is not guaranteed to produce a globally shortest superstring.
+2. Approach
+
+For two strings A and B, define their overlap as the maximum length k such that the last k characters of A equal the first k characters of B.
+
+For example:
+
+- A=ttABC
+- B=ttBCD
+
+The suffix BC of A matches the prefix BC of B. The overlap length is two.
+
+The merge is
+
+ABC + D = ABCD
+
+The greedy procedure is:
+
+1. Examine every pair of remaining strings.
+2. Calculate the suffix-prefix overlap in both directions.
+3. Select the pair with the largest overlap.
+4. Merge the pair while retaining the overlapping portion only once.
+5. Remove the original pair and insert the merged string.
+6. Repeat until only one string remains.
+
+For a more robust implementation, remove strings that are already substrings of other input strings before beginning the merge process.
+3. Algorithm
+
+1. Read the number of strings and the strings themselves.
+2. Remove duplicate strings and strings contained in another input string, if the implementation includes preprocessing.
+3. While more than one string remains:
+- Find the pair with the maximum suffix-prefix overlap.
+- If the overlap is positive, merge the pair without duplicating the shared characters.
+- If no positive overlap exists, concatenate a selected pair; the standard greedy process still reduces the number of strings.
+- Replace the two strings with the merged string.
+4. Return the final string.
+5. Report its length.
+4. Pseudocode
+
+GREEDY-SUPERSTRING(strings):
+remove duplicate and contained strings if applicable
+
+while number of strings > 1:
+bestOverlap = -1
+bestI = 0
+bestJ = 1
+bestMerged = empty string
+
+for each ordered pair (i, j), i != j:
+overlap = maximum suffix-prefix overlap
+between strings[i] and strings[j]
+
+if overlap > bestOverlap:
+bestOverlap = overlap
+bestI = i
+bestJ = j
+
+bestMerged = strings[i]
++ strings[j][overlap...]
+
+remove strings[bestI] and strings[bestJ]
+insert bestMerged
+
+return the remaining string
+
+The notation strings[j][overlap...] means the portion of the second string after the overlapping prefix.
+5. Sample input
+
+Number of strings: 3
+
+String 1: ABC
+String 2: BCD
+String 3: CDE
+
+6. Sample output
+
+Greedy merge steps:
+
+Merge ABC and BCD:
+Overlap = 2
+Result = ABCD
+
+Merge ABCD and CDE:
+Overlap = 2
+Result = ABCDE
+
+Greedy superstring: ABCDE
+Length: 5
+
+7. Dry run
+
+The initial collection is
+
+S=\\ttABC,ttBCD,ttCDE\\ 
+Step 1: Calculate pairwise overlaps
+
+Pair 1: ABC and BCD
+
+- Suffix of ABC: BC
+- Prefix of BCD: BC
+- Overlap length: 2
+
+Merged string:
+
+ABCD
+
+Pair 2: BCD and CDE
+
+- Suffix of BCD: CD
+- Prefix of CDE: CD
+- Overlap length: 2
+
+Merged string:
+
+BCDE
+
+Pair 3: ABC and CDE
+
+- The suffix of ABC does not match a nonempty prefix of CDE.
+- Overlap length: 0.
+
+The largest overlap is two. Either of the first two pairs may be chosen in this example because both have the same overlap length.
+Step 2: Merge ABC and BCD
+
+The shared portion is BC.
+
+Instead of writing ABCBCD, retain the first string and append only the part of BCD after its overlapping prefix:
+
+ABC + D = ABCD
+
+The collection becomes
+
+S=\\ttABCD,ttCDE\\ 
+Step 3: Merge ABCD and CDE
+
+The suffix CD of ABCD matches the prefix CD of CDE.
+
+Therefore,
+
+ABCD + E = ABCDE
+
+Only one string remains.
+Step 4: Verify the result
+
+The final string is
+
+ABCDE
+
+It contains all three input strings:
+
+- ABC occurs at positions 0–2.
+- BCD occurs at positions 1–3.
+- CDE occurs at positions 2–4.
+
+The final length is
+
+5 
+
+This is a shortest common superstring for this particular example. It does not establish that the greedy procedure always finds a shortest superstring for arbitrary inputs.
+8. Time complexity derivation
+
+Let:
+
+- n be the number of input strings.
+- L be the maximum length of a string during the merge process.
+
+A straightforward implementation scans all ordered pairs of strings at every iteration.
+
+Number of pairs: At most n(n-1), which is O(n^2).
+
+Number of iterations: Every merge reduces the number of strings by one. Therefore, there are n-1 merge iterations, or O(n) iterations.
+
+Overlap calculation: A direct suffix-prefix comparison can take O(L) time per pair, assuming the implementation compares characters without repeatedly creating costly temporary substrings.
+
+The total time complexity is therefore
+
+T(n,L)=O(n)* O(n^2)* O(L) 
+
+Hence,
+
+T(n,L)=O(n^3L) 
+
+This bound assumes a straightforward character-by-character overlap calculation. If overlap computation or string construction is implemented inefficiently, the actual running time may be higher.
+9. Space complexity derivation
+
+The algorithm must store the input strings and the strings produced during merging.
+
+If there are n input strings, each of length at most L, the input storage is
+
+O(nL) 
+
+The merged strings may contain characters from multiple input strings. Without preprocessing or more sophisticated representations, the current collection can contain strings whose combined storage is on the order of O(nL).
+
+Additional variables for overlap lengths, pair indices, and loop counters require O(1) space, excluding temporary strings.
+
+Thus, a typical overall storage bound is
+
+S(n,L)=O(nL) 
+
+This excludes any extra copies created by a particular programming-language string implementation.
+10. Greedy algorithm versus the research claim
+
+The greedy superstring algorithm is easy to implement and provides a practical approximation, but it should not be described as an exact algorithm for all inputs.
+
+If the lab sheet mentions a September 2026 preprint claiming a particular approximation lower bound or ratio, treat that statement as a claim made by the supplied lab material unless the paper and its proof have been independently checked. A research claim about the performance of a greedy algorithm is separate from the algorithm's implementation and from the result of this sample run.
+
+Conclusion: The greedy superstring algorithm repeatedly merges the pair with the largest suffix-prefix overlap. Its straightforward implementation takes O(n^3L) time under the stated overlap-computation assumptions and produces a common superstring, but it does not guarantee a globally shortest result for every input.

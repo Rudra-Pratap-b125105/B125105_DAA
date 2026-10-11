@@ -1,0 +1,153 @@
+Q4 — Minimum Cost to Connect Sticks
+
+Suggested filename: Q4_Minimum_Cost_to_Connect_Sticks.txt
+1. Problem understanding
+
+We are given several sticks of different lengths. Connecting two sticks costs an amount equal to the sum of their lengths. After connecting them, they become one longer stick.
+
+The objective is to connect all sticks while minimizing the total cost.
+
+For example, connecting sticks of lengths 2 and 4 costs 6 and produces a stick of length 6. That new stick may be connected with another stick later, incurring another cost.
+
+The key observation is that a stick created early may participate in multiple future connections. Therefore, repeatedly connecting the two smallest available sticks is optimal.
+2. Approach
+
+Use a min-heap to efficiently retrieve the two shortest sticks.
+
+At each step:
+
+1. Remove the two smallest lengths.
+2. Add their lengths to obtain the new stick.
+3. Add that length to the total cost.
+4. Insert the new stick into the heap.
+5. Repeat until only one stick remains.
+
+Choosing the two smallest sticks first minimizes the contribution of those lengths to later merges. This is the same greedy structure used by Huffman coding.
+3. Algorithm
+
+1. Read the number of sticks and their lengths.
+2. Insert all lengths into a min-heap.
+3. Initialize totalCost to zero.
+4. While more than one stick remains:
+- Extract the smallest stick.
+- Extract the next-smallest stick.
+- Calculate their combined length.
+- Add the combined length to totalCost.
+- Insert the combined length back into the heap.
+5. Display the total cost.
+4. Pseudocode
+
+MINIMUM-CONNECTION-COST(lengths):
+create a min-heap from lengths
+totalCost = 0
+
+while heap size > 1:
+first = extract minimum
+second = extract minimum
+
+combined = first + second
+totalCost = totalCost + combined
+
+insert combined into heap
+
+return totalCost
+
+5. Sample input
+
+Number of sticks: 4
+Stick lengths: 2 4 3 6
+
+6. Sample output
+
+Connection steps:
+Connect 2 and 3 -> Cost = 5
+Connect 4 and 5 -> Cost = 9
+Connect 6 and 9 -> Cost = 15
+
+Minimum total cost: 29
+
+7. Dry run
+
+Initially, the min-heap contains
+
+\\2,3,4,6\\ 
+
+Step 1: Remove the two smallest sticks, 2 and 3.
+
+2+3=5 
+
+The connection costs 5. Insert the new stick of length 5.
+
+Total cost:
+
+C=5 
+
+Heap:
+
+\\4,5,6\\ 
+
+Step 2: Remove 4 and 5.
+
+4+5=9 
+
+The connection costs 9. Insert the new stick of length 9.
+
+Total cost:
+
+C=5+9=14 
+
+Heap:
+
+\\6,9\\ 
+
+Step 3: Remove 6 and 9.
+
+6+9=15 
+
+The connection costs 15.
+
+Total cost:
+
+C=5+9+15=29 
+
+Only one stick remains, so the process terminates.
+
+The minimum total connection cost is
+
+29 
+8. Time complexity derivation
+
+Let n be the number of sticks.
+
+Building a min-heap from all stick lengths takes O(n).
+
+Each connection reduces the number of sticks by one. Therefore, exactly n-1 connections are performed.
+
+Each connection involves:
+
+- Two minimum extractions: 2O(log n)
+- One insertion: O(log n)
+
+The total time is
+
+beginaligned T(n)&=O(n)+(n-1)bigl(3O(log n)bigr)\\\ &=O(n)+O(nlog n) endaligned 
+
+Thus,
+
+T(n)=O(nlog n) 
+9. Space complexity derivation
+
+The min-heap stores up to n stick lengths.
+
+- Heap storage: O(n)
+- A fixed number of temporary variables: O(1)
+
+Therefore,
+
+S(n)=O(n)+O(1) 
+
+Hence,
+
+S(n)=O(n) 
+
+Conclusion: Repeatedly connecting the two smallest sticks using a min-heap produces the minimum total connection cost in O(nlog n) time.

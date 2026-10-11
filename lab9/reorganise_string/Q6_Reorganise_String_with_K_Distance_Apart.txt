@@ -1,0 +1,149 @@
+Q6 — Reorganise String with K-Distance Apart
+
+Suggested filename: Q6_Reorganise_String_with_K_Distance_Apart.txt
+1. Problem understanding
+
+Given a string and an integer k, rearrange its characters so that any two occurrences of the same character are at least k positions apart.
+
+If the required arrangement is impossible, report that no valid rearrangement exists.
+
+For example, with k=3, two occurrences of a must have at least two other character positions between them. If a occurs at index 0, its next occurrence cannot be at index 1 or 2.
+
+The distance requirement applies to equal characters, not to every pair of characters.
+2. Approach
+
+Use a max-heap of character frequencies and a cooldown queue.
+
+The max-heap makes the character with the highest remaining frequency available first. After placing a character, it cannot be reused until the required distance has passed.
+
+The cooldown queue temporarily stores recently used characters and the positions at which they become available again.
+
+At each position:
+
+1. Release any characters whose cooldown has expired.
+2. Select the available character with the highest remaining frequency.
+3. Append it to the output.
+4. Decrease its remaining frequency.
+5. If it still has occurrences remaining, place it in the cooldown queue.
+
+If the heap is empty while the output is incomplete, the arrangement is impossible.
+3. Algorithm
+
+1. Count the frequency of every character.
+2. Insert all characters and their frequencies into a max-heap.
+3. Create an empty cooldown queue.
+4. For each output position:
+- Release eligible characters from the cooldown queue.
+- If no character is available, report failure.
+- Remove the character with the highest remaining frequency.
+- Append it to the result.
+- If it has more occurrences, schedule its next availability at position i+k.
+5. If all characters have been placed, return the rearranged string.
+4. Pseudocode
+
+REORGANISE(string, k):
+count frequency of every character
+insert characters into max-heap by frequency
+
+create empty cooldown queue
+result = empty string
+
+for position i from 0 to length(string) - 1:
+release all queued characters
+whose release position <= i
+
+if heap is empty:
+return IMPOSSIBLE
+
+character = extract maximum
+append character to result
+decrease its remaining frequency
+
+if frequency[character] > 0:
+enqueue (character, i + k)
+
+return result
+
+5. Sample input
+
+String: aabbcc
+K: 3
+
+6. Sample output
+
+Reorganised string: acbacb
+
+7. Dry run
+
+The string contains two occurrences each of a, b, and c.
+
+Initial frequencies:
+
+a:2, b:2, c:2 
+
+For equal frequencies, any consistent tie-breaking rule can be used. The following dry run selects a, then c, then b.
+
+| Position | Chosen character | Remaining frequency | Explanation |
+| -------- | ---------------- | ------------------- | --------------------------------------------------- |
+| 0 | a | a:1 | a is placed; next use is allowed at position 3 |
+| 1 | c | c:1 | a is cooling down |
+| 2 | b | b:1 | a is still cooling down |
+| 3 | a | a:0 | a becomes available |
+| 4 | c | c:0 | The next c is three positions after its first use |
+| 5 | b | b:0 | The next b is three positions after its first use |
+
+The resulting string is
+
+acbacb
+
+Check the positions:
+
+- a: positions 0 and 3, distance 3.
+- c: positions 1 and 4, distance 3.
+- b: positions 2 and 5, distance 3.
+
+Every repeated character satisfies the distance requirement.
+Impossible example
+
+Input:
+
+String: aaabc
+K: 3
+
+There are three a characters but only two other characters, b and c. With a required distance of three, the three a characters cannot all be separated sufficiently in a string of length five.
+
+The algorithm eventually reaches a position where no character is available, so it reports IMPOSSIBLE.
+8. Time complexity derivation
+
+Let n be the string length and m be the number of distinct characters.
+
+- Counting frequencies takes O(n).
+- Building a heap from m character entries takes O(m) with bottom-up construction.
+- Each character position requires at most one heap extraction and one heap insertion, each costing O(log m).
+- Each character occurrence enters and leaves the cooldown queue at most once, costing O(1) per queue operation.
+
+Therefore,
+
+T(n)=O(n)+O(nlog m)+O(n) 
+
+Thus,
+
+T(n)=O(nlog m) 
+
+Since m<= n, a general upper bound is O(nlog n). For a fixed character set, such as the 26 lowercase English letters, m is bounded by a constant, so the runtime is effectively O(n).
+9. Space complexity derivation
+
+- Frequency table: O(m).
+- Max-heap: O(m).
+- Cooldown queue: at most O(m) entries when each distinct character is scheduled once at a time.
+- Output string: O(n).
+
+Therefore, total storage including the output is
+
+S(n)=O(m)+O(m)+O(m)+O(n) 
+
+Since m<= n,
+
+S(n)=O(n) 
+
+Conclusion: A max-heap prioritizes the most frequent available character, while the cooldown queue prevents characters from being reused too early.

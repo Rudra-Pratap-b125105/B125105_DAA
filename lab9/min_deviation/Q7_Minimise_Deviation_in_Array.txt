@@ -1,0 +1,191 @@
+Q7 — Minimise Deviation in an Array
+
+Suggested filename: Q7_Minimise_Deviation_in_Array.txt
+1. Problem understanding
+
+Given an array of positive integers, the objective is to minimize the difference between the largest and smallest elements after applying the allowed operations.
+
+For this common version of the problem:
+
+- An odd number may be doubled.
+- An even number may be divided by two.
+- These operations can be repeated as allowed by the problem definition.
+
+The deviation is
+
+D=max(A)-min(A) 
+
+The task is to obtain the smallest possible deviation.
+2. Approach
+
+A useful normalization is to make every odd number even by doubling it once. Then every number can be reduced by repeatedly halving it while it is even.
+
+The greedy algorithm maintains a max-heap and the current minimum value.
+
+1. Double every odd number and insert the normalized values into a max-heap.
+2. Track the minimum normalized value.
+3. Calculate the current deviation between the heap's maximum and the tracked minimum.
+4. Remove the maximum.
+5. If the maximum is odd, stop: it cannot be reduced by halving.
+6. Otherwise, halve it, update the minimum if necessary, and reinsert it.
+7. Repeat while reducing the maximum is possible.
+
+Reducing the current maximum is the useful greedy choice because it can shrink the range without increasing the maximum. The algorithm records the best deviation seen at every stage.
+3. Algorithm
+
+1. Read the array.
+2. For each odd number, double it.
+3. Insert all normalized values into a max-heap.
+4. Find the minimum normalized value.
+5. Initialize the best deviation using the current maximum and minimum.
+6. While the maximum is even:
+- Remove it from the heap.
+- Halve it.
+- Update the current minimum.
+- Insert the halved value.
+- Update the best deviation.
+7. Output the minimum deviation found.
+4. Pseudocode
+
+MINIMISE-DEVIATION(array):
+create max-heap
+minimum = infinity
+
+for each value x:
+if x is odd:
+x = 2 * x
+
+insert x into max-heap
+minimum = min(minimum, x)
+
+best = maximum(max-heap) - minimum
+
+while maximum(max-heap) is even:
+x = extract maximum
+x = x / 2
+
+minimum = min(minimum, x)
+insert x into max-heap
+
+best = min(
+best,
+maximum(max-heap) - minimum
+)
+
+return best
+
+5. Sample input
+
+Number of elements: 4
+Array: 4 1 5 20
+
+6. Sample output
+
+Normalised array: 4 2 10 20
+Minimum deviation: 3
+
+7. Dry run
+
+The input array is
+
+[4,1,5,20] 
+
+Double each odd number:
+
+- 1->2
+- 5->10
+
+The normalized array is
+
+[4,2,10,20] 
+
+The current minimum is 2, and the maximum is 20.
+
+Initial deviation:
+
+D=20-2=18 
+
+Iteration 1
+
+The maximum is 20, which is even. Halve it:
+
+20/2=10 
+
+The array values are now equivalent to
+
+[4,2,10,10] 
+
+The deviation is
+
+10-2=8 
+
+Best deviation so far: 8.
+
+Iteration 2
+
+The maximum is 10, which is even. Halve it:
+
+10/2=5 
+
+The values become
+
+[4,2,5,10] 
+
+The deviation is
+
+10-2=8 
+
+Best deviation remains 8.
+
+Iteration 3
+
+The maximum is again 10. Halve it:
+
+10/2=5 
+
+The values become
+
+[4,2,5,5] 
+
+The deviation is
+
+5-2=3 
+
+Best deviation becomes 3.
+
+Stopping condition
+
+The maximum is now 5, which is odd. It cannot be reduced by the permitted halving operation. The algorithm stops and returns
+
+3 
+8. Time complexity derivation
+
+Let n be the number of elements and M be the largest normalized value.
+
+- Normalizing and inserting the elements takes O(nlog n) using repeated heap insertions.
+- Each halving iteration reduces an even maximum by a factor of two.
+- A value can be halved at most O(log M) times before reaching an odd value.
+- Each iteration performs a heap extraction and insertion, costing O(log n).
+
+There are at most O(log M) iterations for the repeatedly reduced maximum in the standard algorithm.
+
+Therefore,
+
+T(n,M)=O(nlog n)+O(log Mlog n) 
+
+A commonly used conservative bound is
+
+T(n,M)=O(nlog n+log Mlog n) 
+
+This is also often written as O(nlog nlog M) as a looser upper bound. The more precise expression separates the heap-building work from the halving loop.
+9. Space complexity derivation
+
+- The max-heap stores n values: O(n).
+- The input or normalized array, if retained, uses O(n).
+- A fixed number of variables tracks the minimum and best deviation: O(1).
+
+The auxiliary heap space is O(n). Including the input array, total space is also
+
+S(n)=O(n) 
+
+Conclusion: Normalization allows all values to be reduced through halving. The max-heap repeatedly reduces the largest value and tracks the smallest value to find the minimum deviation.

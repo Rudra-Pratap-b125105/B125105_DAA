@@ -1,0 +1,192 @@
+Q2 — Huffman Coding with Canonical Codebook
+
+Suggested filename: Q2_Huffman_Coding_Canonical_Codebook.txt
+1. Problem understanding
+
+Huffman coding is a lossless compression technique that assigns shorter binary codes to frequently occurring symbols and longer codes to less frequent symbols.
+
+A Huffman code is a prefix-free code: no symbol's code is the prefix of another symbol's code. This property allows a compressed bitstream to be decoded unambiguously.
+
+Canonical Huffman coding generates a standardized codebook from the code lengths produced by a Huffman tree. Instead of storing the entire tree, it is sufficient to store the symbols and their code lengths, along with a consistent symbol ordering.
+2. Approach
+
+The solution has two major stages.
+
+Stage 1: Construct the Huffman code lengths
+
+1. Insert each symbol and its frequency into a min-heap.
+2. Remove the two nodes with the smallest frequencies.
+3. Combine them into a parent node whose frequency is their sum.
+4. Insert the parent node back into the heap.
+5. Repeat until one node remains.
+6. Traverse the resulting tree to determine each symbol's code length.
+
+Stage 2: Generate canonical codes
+
+1. Sort symbols by increasing code length.
+2. Break ties using a fixed symbol ordering, such as alphabetical order.
+3. Assign the first symbol the smallest binary code of its length.
+4. For each subsequent symbol, increment the previous code and extend it to the new length when necessary.
+3. Algorithm
+
+1. Read all symbols and their frequencies.
+2. Build a min-heap containing one leaf node per symbol.
+3. Repeatedly merge the two minimum-frequency nodes.
+4. Traverse the final tree to calculate the code length of each symbol.
+5. Sort the symbols by (code length, symbol).
+6. Generate canonical codes in this order.
+7. Display each symbol, frequency, code length, and binary code.
+8. Calculate the total encoded length by multiplying each frequency by its code length and summing the results.
+4. Pseudocode
+
+HUFFMAN-CANONICAL(symbols):
+create an empty min-heap
+
+for each symbol:
+insert its frequency as a leaf node
+
+while heap contains more than one node:
+left = extract minimum
+right = extract minimum
+
+parent.frequency = left.frequency + right.frequency
+parent.left = left
+parent.right = right
+
+insert parent into heap
+
+root = extract minimum
+calculate code lengths by traversing root
+
+sort symbols by increasing code length
+break equal-length ties using symbol order
+
+assign the first canonical code
+
+for each subsequent symbol:
+increment the previous code
+extend it to the current code length
+
+return canonical codebook
+
+5. Sample input
+
+Number of symbols: 5
+
+Symbol A: Frequency = 45
+Symbol B: Frequency = 13
+Symbol C: Frequency = 12
+Symbol D: Frequency = 16
+Symbol E: Frequency = 9
+
+6. Sample output
+
+One valid canonical codebook is:
+
+Symbol Frequency Code Length Canonical Code
+A 45 1 0
+B 13 3 100
+C 12 3 101
+D 16 3 110
+E 9 3 111
+
+Total encoded bits: 195
+
+7. Dry run
+Stage 1: Build the Huffman tree
+
+Initially, the heap contains the frequencies:
+
+\\45,13,12,16,9\\ 
+
+Merge 1: Remove the two smallest frequencies, 9 and 12.
+
+9+12=21 
+
+Insert the new node with frequency 21.
+
+Remaining frequencies:
+
+\\13,16,21,45\\ 
+
+Merge 2: Remove 13 and 16.
+
+13+16=29 
+
+Remaining frequencies:
+
+\\21,29,45\\ 
+
+Merge 3: Remove 21 and 29.
+
+21+29=50 
+
+Remaining frequencies:
+
+\\45,50\\ 
+
+Merge 4: Remove 45 and 50.
+
+45+50=95 
+
+The root frequency is 95, equal to the sum of all symbol frequencies.
+
+The symbol A is directly attached to the root, so its code length is 1. The other four symbols have code length 3.
+Stage 2: Generate canonical codes
+
+Sort the symbols by code length and then alphabetically:
+
+A(1), B(3), C(3), D(3), E(3) 
+
+- A receives the one-bit code 0.
+- The next code length is 3. Incrementing the previous code and extending to three bits gives 100 for B.
+- Increment 100 to obtain 101 for C.
+- Increment 101 to obtain 110 for D.
+- Increment 110 to obtain 111 for E.
+
+The codebook is prefix-free: 0 is not a prefix of any of the other codes because the other codes begin with 1.
+Calculate the total encoded bits
+
+The number of bits needed is
+
+L=sum_i=1^nf_iell_i 
+
+where f_i is the symbol frequency and ell_i is its code length.
+
+Substituting the sample values:
+
+beginaligned L=&45(1)+13(3)+12(3)\\\ &+16(3)+9(3)\\\ =&45+39+36+48+27\\\ =&195 endaligned 
+
+Therefore, the encoded data requires 195 bits, excluding any metadata required to store or transmit the codebook.
+8. Time complexity derivation
+
+Let n be the number of distinct symbols.
+
+- Building the initial heap takes O(n) using bottom-up heap construction.
+- There are n-1 merges.
+- Each merge performs two minimum extractions and one insertion, each costing O(log n).
+- Calculating code lengths visits every tree node, taking O(n).
+- Sorting symbols for canonical assignment takes O(nlog n).
+
+Therefore,
+
+beginaligned T(n)&=O(n)+(n-1)O(log n)\\\ & +O(n)+O(nlog n) endaligned 
+
+Hence,
+
+T(n)=O(nlog n) 
+9. Space complexity derivation
+
+- The heap and the Huffman tree require O(n) storage.
+- The code lengths and canonical codebook require O(n).
+- Tree traversal uses at most O(n) recursive stack space in the worst case.
+
+Thus,
+
+S(n)=O(n)+O(n)+O(n) 
+
+and
+
+S(n)=O(n) 
+
+Conclusion: Huffman coding determines efficient prefix-code lengths, while canonical assignment provides a reproducible codebook based on those lengths and a fixed symbol ordering.

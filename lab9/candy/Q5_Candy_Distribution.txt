@@ -1,0 +1,147 @@
+Q5 — Candy Distribution
+
+Suggested filename: Q5_Candy_Distribution.txt
+1. Problem understanding
+
+There are n children standing in a line. Each child has a rating, and every child must receive at least one candy.
+
+The distribution must satisfy two rules:
+
+1. A child with a higher rating than an adjacent child must receive more candies than that neighbor.
+2. The total number of candies distributed must be as small as possible.
+
+The comparison is local: each child only needs to be compared with the children immediately to their left and right.
+2. Approach
+
+A single left-to-right pass cannot handle every case because a child may need more candies than the child on the right.
+
+Instead, use two passes.
+
+Left-to-right pass: If a child has a higher rating than the child immediately to the left, give that child one more candy than the left neighbor.
+
+Right-to-left pass: If a child has a higher rating than the child immediately to the right, ensure that the child has at least one more candy than the right neighbor. Use the maximum of the current allocation and the required allocation so that the first pass's constraint is not broken.
+
+This approach satisfies both directional constraints without repeatedly recalculating the entire array.
+3. Algorithm
+
+1. Read the number of children and their ratings.
+2. Give every child one candy.
+3. Traverse from left to right:
+- If the current rating is higher than the previous rating, assign one more candy than the previous child.
+4. Traverse from right to left:
+- If the current rating is higher than the next rating, assign at least one more candy than the next child.
+5. Add all candy counts.
+6. Display the candy allocation and the total.
+4. Pseudocode
+
+CANDY(ratings):
+n = number of children
+candies = array of size n
+
+for i = 0 to n - 1:
+candies[i] = 1
+
+for i = 1 to n - 1:
+if ratings[i] > ratings[i - 1]:
+candies[i] = candies[i - 1] + 1
+
+for i = n - 2 down to 0:
+if ratings[i] > ratings[i + 1]:
+candies[i] = max(
+candies[i],
+candies[i + 1] + 1
+)
+
+return candies and sum(candies)
+
+5. Sample input
+
+Number of children: 5
+Ratings: 1 3 2 2 1
+
+6. Sample output
+
+Ratings: 1 3 2 2 1
+Candies: 1 2 1 2 1
+
+Minimum total candies: 7
+
+7. Dry run
+
+Initial ratings:
+
+[1,3,2,2,1] 
+
+Give each child one candy:
+
+C=[1,1,1,1,1] 
+Pass 1: Left to right
+
+Compare each child with the child on the left.
+
+- Index 1: Rating 3>1. Give child 1 two candies.
+- Index 2: Rating 2<3. Keep one candy.
+- Index 3: Rating 2=2. Keep one candy.
+- Index 4: Rating 1<2. Keep one candy.
+
+After the first pass:
+
+C=[1,2,1,1,1] 
+
+This pass satisfies the requirement that every child with a higher rating than the left neighbor receives more candies.
+Pass 2: Right to left
+
+Start at index 3 and move toward index 0.
+
+- Index 3: Rating 2>1. The child needs at least two candies. Update the allocation to two.
+- Index 2: Rating 2=2. No update is required.
+- Index 1: Rating 3>2. The child already has two candies, so the allocation remains two.
+- Index 0: Rating 1<3. No update is required.
+
+Final allocation:
+
+C=[1,2,1,2,1] 
+
+Total candies:
+
+1+2+1+2+1=7 
+Why use max in the second pass?
+
+Suppose ratings are
+
+[1,2,3,2] 
+
+The first pass gives
+
+[1,2,3,1] 
+
+During the reverse pass, the final child must receive more candies than the preceding child because its rating is lower, so no change is needed there. More generally, if a reverse-pass requirement applies to a child who already received enough candies from the first pass, replacing the allocation blindly could violate the left-neighbor constraint. Taking the maximum preserves both requirements.
+8. Time complexity derivation
+
+Let n be the number of children.
+
+- Initializing the candy array takes O(n).
+- The left-to-right pass examines n-1 adjacent pairs, taking O(n).
+- The right-to-left pass examines n-1 adjacent pairs, taking O(n).
+- Summing the candy array takes O(n).
+
+Therefore,
+
+T(n)=O(n)+O(n)+O(n)+O(n) 
+
+Hence,
+
+T(n)=O(n) 
+9. Space complexity derivation
+
+The algorithm stores one candy count per child.
+
+- Ratings array: O(n), if included in total storage.
+- Candy array: O(n).
+- Loop variables and the running total: O(1).
+
+The auxiliary space beyond the input is O(n), because of the candy array.
+
+S(n)=O(n) 
+
+Conclusion: The two-pass greedy method satisfies both neighbor constraints and obtains the minimum total candy count in linear time.

@@ -1,0 +1,150 @@
+Q3 — Minimum Initial Fuel (Reverse Greedy)
+
+Suggested filename: Q3_Minimum_Initial_Fuel_Reverse_Greedy.txt
+1. Problem understanding
+
+A vehicle must travel from position 0 to a destination at position T. It begins with some amount of fuel and can refuel at specified stations along the route.
+
+Each station has:
+
+- A position along the route.
+- An amount of fuel it can provide.
+
+The objective is to determine the minimum initial fuel required to reach the destination, assuming that fuel consumption is one unit per unit of distance, fuel can be added at stations, and there are no tank-capacity restrictions.
+
+This problem can be solved by simulating travel from the starting point using a greedy strategy. A max-heap stores the fuel available at stations that have already been reached.
+2. Approach
+
+As the vehicle advances, it collects all stations within its current reachable distance.
+
+If it cannot reach the next station or the destination, it must select a station it has already passed or reached and use its fuel. The greedy choice is the station with the largest available fuel amount.
+
+This maximizes the distance gained per refueling stop and minimizes the number of stops for a fixed starting fuel.
+
+To find the minimum initial fuel, we can binary-search a candidate initial fuel amount and test whether it allows the destination to be reached. Alternatively, a problem variant may specify a reverse-greedy method with different assumptions.
+
+The example below demonstrates the classic max-heap refueling feasibility simulation and the minimum starting fuel for that example.
+3. Algorithm
+
+1. Sort the stations by their positions if they are not already sorted.
+2. Set the current reachable position to the initial fuel amount.
+3. Insert the fuel supplies of all stations within the reachable distance into a max-heap.
+4. While the destination is beyond the reachable position:
+- If the heap is empty, the destination is unreachable with the current initial fuel.
+- Otherwise, remove the largest fuel supply from the heap and add it to the reachable distance.
+5. Count the refueling operations.
+6. To find the minimum initial fuel, test candidate values and search for the smallest feasible one.
+4. Pseudocode
+
+CAN-REACH(destination, stations, initialFuel):
+sort stations by position
+
+reach = initialFuel
+i = 0
+create empty max-heap
+
+while reach < destination:
+while i < number of stations
+and stations[i].position <= reach:
+insert stations[i].fuel into max-heap
+i = i + 1
+
+if max-heap is empty:
+return false
+
+reach = reach + extract maximum from max-heap
+
+return true
+
+To find the minimum initial fuel, use binary search over candidate starting-fuel values and call CAN-REACH for each candidate.
+5. Sample input
+
+Destination: 100
+Number of stations: 4
+Stations (position, fuel):
+
+(10, 60)
+(20, 30)
+(30, 30)
+(60, 40)
+
+6. Sample output
+
+Minimum initial fuel: 10
+Minimum refuelling stops with this initial fuel: 2
+
+7. Dry run
+
+The vehicle starts at position 0 with 10 units of fuel. Therefore, its initial reachable position is 10.
+
+Step 1: Reach position 10
+
+Station (10,60) is now reachable. Its fuel supply enters the max-heap.
+
+The vehicle uses the 60 units of fuel from this station:
+
+reach=10+60=70 
+
+Refueling stops: 1.
+
+Step 2: Collect the stations within reach
+
+Stations at positions 20, 30, and 60 are within reach. Their fuel supplies are 30, 30, and 40.
+
+The maximum available supply is 40.
+
+Refuel at the station providing 40 units:
+
+reach=70+40=110 
+
+Refueling stops: 2.
+
+Since
+
+110>=100 
+
+the vehicle can reach the destination.
+
+Why is 10 the minimum initial fuel?
+
+With zero initial fuel, the vehicle cannot reach any station located beyond its starting position. With an initial fuel of 10, it can reach the first station, whose fuel supply then enables further travel.
+
+Under the stated model, starting with less than 10 cannot reach the first station at position 10, so 10 is the minimum.
+8. Time complexity derivation
+
+Let n be the number of stations.
+
+Sorting the stations takes
+
+O(nlog n) 
+
+Each station is inserted into the heap at most once. Each station's fuel is removed from the heap at most once. Each heap operation costs O(log n).
+
+Thus, the feasibility test takes
+
+O(nlog n) 
+
+If the minimum initial fuel is found using binary search over an integer range of size R, there are O(log R) feasibility tests.
+
+The overall complexity is therefore
+
+O(nlog nlog R) 
+
+If the initial fuel is fixed and only the required refueling stops are being calculated, the complexity is
+
+O(nlog n) 
+9. Space complexity derivation
+
+- The station array requires O(n).
+- The max-heap can hold up to n station supplies, requiring O(n).
+- The remaining variables require O(1).
+
+Therefore,
+
+S(n)=O(n)+O(n)+O(1) 
+
+Hence,
+
+S(n)=O(n) 
+
+Conclusion: The max-heap greedy strategy chooses the largest available fuel supply when additional fuel is necessary. Binary search can then identify the smallest feasible initial fuel. This solution assumes unlimited tank capacity and fuel consumption proportional to distance.
