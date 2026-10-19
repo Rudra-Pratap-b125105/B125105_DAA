@@ -1,0 +1,293 @@
+DAA LAB 10 — QUESTION 3
+MAXIMUM WEIGHT COMPONENT WITH SIZE CONSTRAINTS
+
+1. AIM
+
+To maintain connected components in a weighted graph as edges are added sequentially and report the maximum total vertex weight among components whose number of vertices does not exceed a given limit K.
+
+2. PROBLEM UNDERSTANDING
+
+An undirected graph contains V vertices. Each vertex has a weight, which may represent its value, importance, or contribution.
+
+Edges arrive sequentially. Whenever an edge is added, two previously separate components may become connected.
+
+After each edge insertion, the algorithm must determine the maximum sum of vertex weights among all connected components containing at most K vertices.
+
+For a connected component C, define:
+
+Component Weight(C) = Sum of weights of all vertices in C
+
+Component Size(C) = Number of vertices in C
+
+A component is eligible if:
+
+Component Size(C) ≤ K
+
+The required answer is the largest component weight among all eligible components.
+
+If no eligible component exists, the program reports NONE.
+
+3. CONCEPTS USED
+
+3.1 Disjoint Set Union
+
+DSU efficiently maintains connected components as edges are added.
+
+Each component is represented by a root. The parent array supports find operations, while the size array stores the number of vertices in each component.
+
+3.2 Component Weight
+
+The sum array stores the total weight of the vertices in a component.
+
+When two components merge, their sizes and weights are combined:
+
+size[newRoot] = size[rootA] + size[rootB]
+
+sum[newRoot] = sum[rootA] + sum[rootB]
+
+3.3 Maximum Heap
+
+A maximum heap stores candidate components in decreasing order of their total weights.
+
+The component with the greatest weight is kept at the top, allowing the algorithm to find a maximum candidate efficiently.
+
+3.4 Lazy Invalidation
+
+When components merge, previously inserted heap entries may become outdated.
+
+Instead of searching through the heap to delete every outdated entry, each component root maintains a version number. A heap entry is valid only if:
+- Its root is still a root.
+- Its stored version matches the current version.
+- The component size is at most K.
+
+Invalid entries are removed when they reach the top of the heap.
+
+4. APPROACH
+
+Initially, every vertex forms a separate component. Its size is 1 and its component weight equals its vertex weight.
+
+Every eligible singleton component is inserted into the maximum heap.
+
+For each incoming edge (u, v):
+
+1. Find the roots of u and v.
+2. If they belong to the same component, the edge does not change the component structure.
+3. Otherwise, merge the smaller component into the larger component.
+4. Update the size and total weight of the resulting component.
+5. Update version numbers to invalidate outdated heap entries.
+6. If the merged component has size at most K, insert its current weight into the heap.
+7. Remove invalid heap entries from the top until a valid candidate is found.
+8. Report the maximum weight of a valid component, or NONE if no eligible component exists.
+
+The heap avoids scanning every vertex after every edge insertion.
+
+5. ALGORITHM
+
+Step 1: Read V, E, K, and the weight of every vertex.
+Step 2: Initialize every vertex as its own component.
+Step 3: Set each component size to 1 and its weight to the corresponding vertex weight.
+Step 4: Insert every eligible singleton component into the maximum heap.
+Step 5: For every incoming edge:
+        a. Find the component roots of its endpoints.
+        b. If both endpoints already belong to the same component, do not merge.
+        c. Otherwise, merge the components using union by size.
+        d. Update component size and total weight.
+        e. Update the version numbers of affected roots.
+        f. Insert the merged component if its size does not exceed K.
+        g. Remove invalid entries from the heap top.
+        h. Output the maximum valid weight or NONE.
+Step 6: Repeat until all E edges have been processed.
+
+6. PSEUDOCODE
+
+INITIALIZE DSU for all vertices
+
+FOR each vertex v:
+    parent[v] = v
+    size[v] = 1
+    sum[v] = weight[v]
+    version[v] = 0
+
+    IF size[v] <= K:
+        INSERT (sum[v], v, version[v]) INTO MAX_HEAP
+
+FUNCTION ADD_EDGE(u, v):
+    rootU = FIND(u)
+    rootV = FIND(v)
+
+    IF rootU == rootV:
+        RETURN
+
+    IF size[rootU] < size[rootV]:
+        SWAP rootU, rootV
+
+    parent[rootV] = rootU
+    size[rootU] = size[rootU] + size[rootV]
+    sum[rootU] = sum[rootU] + sum[rootV]
+
+    INCREMENT version[rootU]
+    INCREMENT version[rootV]
+
+    IF size[rootU] <= K:
+        INSERT (sum[rootU], rootU, version[rootU]) INTO MAX_HEAP
+
+FUNCTION GET_MAXIMUM():
+    WHILE MAX_HEAP is not empty:
+        entry = TOP(MAX_HEAP)
+
+        IF entry.root is a current root
+           AND entry.version == version[entry.root]
+           AND size[entry.root] <= K:
+            RETURN entry.weight
+
+        REMOVE TOP(MAX_HEAP)
+
+    RETURN NONE
+
+FOR each incoming edge (u, v):
+    ADD_EDGE(u, v)
+    OUTPUT GET_MAXIMUM()
+
+7. SAMPLE INPUT
+
+4 4 2
+5 2 8 4
+1 2
+3 4
+2 3
+1 3
+
+The first line contains V, E, and K.
+The second line contains the weights of vertices 1 through V.
+Each subsequent line contains an edge.
+
+8. SAMPLE OUTPUT
+
+8
+12
+NONE
+NONE
+
+9. DRY RUN
+
+There are four vertices with weights:
+
+Vertex 1: 5
+Vertex 2: 2
+Vertex 3: 8
+Vertex 4: 4
+
+The maximum permitted component size is K = 2.
+
+Initially, every vertex is a separate component:
+
+{1}: size 1, weight 5
+{2}: size 1, weight 2
+{3}: size 1, weight 8
+{4}: size 1, weight 4
+
+All four components are eligible. The maximum weight is 8.
+
+Edge 1: (1, 2)
+
+Components {1} and {2} merge.
+
+New component {1, 2}:
+Size = 2
+Weight = 5 + 2 = 7
+
+The component is eligible because its size equals K.
+
+The other eligible components have weights 8 and 4. The maximum remains 8.
+
+Edge 2: (3, 4)
+
+Components {3} and {4} merge.
+
+New component {3, 4}:
+Size = 2
+Weight = 8 + 4 = 12
+
+This component is eligible, and its weight is greater than 8.
+
+Maximum eligible weight = 12.
+
+Edge 3: (2, 3)
+
+The components {1, 2} and {3, 4} merge.
+
+New component {1, 2, 3, 4}:
+Size = 4
+Weight = 5 + 2 + 8 + 4 = 19
+
+The new component is not eligible because 4 > K.
+
+No eligible components remain.
+
+Therefore, the expected output for this sample is actually:
+
+8
+12
+NONE
+NONE
+
+The first answer is 8, the second is 12, and the third and fourth answers are NONE.
+
+10. CORRECTNESS EXPLANATION
+
+Initially, DSU correctly represents every vertex as a separate component, with the correct size and weight. Every eligible component is inserted into the heap.
+
+When an edge connects two different components, DSU merges them and updates their size and total weight. The resulting component is inserted into the heap only if it satisfies the size constraint.
+
+Whenever an entry becomes outdated because of a merge, its root or version no longer matches the current component information. Such entries are discarded when they reach the heap top.
+
+Therefore, when GET_MAXIMUM returns a weight, that entry represents a current component whose size does not exceed K. Because the heap is a maximum heap, no valid candidate has a greater weight.
+
+If the heap contains no valid entries, no eligible component remains.
+
+Thus, the algorithm reports the required maximum eligible component weight after every edge insertion.
+
+11. TIME COMPLEXITY ANALYSIS
+
+Let:
+V = number of vertices
+E = number of edges
+K = maximum permitted component size
+
+Initializing DSU and inserting the initial V singleton components takes:
+
+T_initialization = O(V log V)
+
+Each edge requires DSU find operations, taking amortized O(alpha(V)) time.
+
+A successful merge creates at most one new heap entry. Therefore, across all edge insertions, the number of heap insertions is at most V + min(E, V - 1), which is O(V + E).
+
+Each heap insertion or removal costs O(log(V + E)) in the worst case. Since each inserted entry can be removed at most once, the total heap-processing cost is:
+
+T_heap = O((V + E) log(V + E))
+
+The DSU processing cost is:
+
+T_DSU = O(E alpha(V))
+
+Therefore, the total time complexity is:
+
+T(V, E) = O(V log V)
+          + O(E alpha(V))
+          + O((V + E) log(V + E))
+
+Hence:
+
+T(V, E) = O((V + E) log(V + E) + E alpha(V))
+
+12. SPACE COMPLEXITY ANALYSIS
+
+The DSU arrays parent[], size[], sum[], and version[] require O(V) space.
+
+The maximum heap can contain O(V + E) entries in the worst case because it stores initial candidates and candidates created by successful merges.
+
+Therefore:
+
+S(V, E) = O(V) + O(V + E)
+
+S(V, E) = O(V + E)

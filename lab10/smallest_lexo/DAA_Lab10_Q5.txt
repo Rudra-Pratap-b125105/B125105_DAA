@@ -1,0 +1,246 @@
+DAA LAB 10 — QUESTION 5
+LEXICOGRAPHICALLY SMALLEST CONNECTED COMPONENT PERMUTATION
+
+1. AIM
+
+To find the lexicographically smallest array obtainable by swapping elements only along the edges of an undirected graph.
+
+2. PROBLEM UNDERSTANDING
+
+An array A contains n values. An undirected graph describes which array positions may be connected through allowed swaps.
+
+If there is an edge between positions u and v, the values at these positions can be swapped. A sequence of swaps along a path allows values to move between any two positions in the same connected component.
+
+However, values cannot move between different connected components.
+
+The objective is to produce the lexicographically smallest possible array after any number of allowed swaps.
+
+An array X is lexicographically smaller than an array Y if, at the first position where they differ, X contains the smaller value.
+
+3. CONCEPTS USED
+
+3.1 Connected Components
+
+A connected component is a maximal group of vertices in which every pair of vertices is connected by a path.
+
+Because swaps can be performed along graph edges, all positions within one connected component can exchange values through a sequence of swaps.
+
+3.2 Disjoint Set Union
+
+DSU identifies which positions belong to the same connected component.
+
+The find operation obtains the component representative, and union merges components connected by an edge.
+
+3.3 Sorting
+
+To obtain the lexicographically smallest arrangement, values within each component must be placed in ascending order at the ascending positions belonging to that component.
+
+The smallest value must occupy the smallest index in the component, the second-smallest value the second-smallest index, and so on.
+
+4. APPROACH
+
+The algorithm proceeds as follows:
+
+1. Read the array values and all graph edges.
+2. Initialize every position as a separate DSU component.
+3. Process every edge and merge the connected components.
+4. For each array position, determine its component root.
+5. Create one list containing the positions grouped by their component roots.
+6. Create another list containing the array values grouped by the same component roots.
+7. Sort the positions by component root and position index.
+8. Sort the values by component root and value.
+9. Match the sorted values to the sorted positions within each component.
+10. Print the resulting array.
+
+Sorting positions by index and values by value ensures that each component receives its smallest values at its earliest positions.
+
+5. ALGORITHM
+
+Step 1: Read n, m, and the array A.
+Step 2: Initialize DSU for all n positions.
+Step 3: Read each of the m edges and merge its endpoints.
+Step 4: Find the final component root of every position.
+Step 5: Store each position with its component root and index.
+Step 6: Store each value with its component root and value.
+Step 7: Sort the position records by root and then by index.
+Step 8: Sort the value records by root and then by value.
+Step 9: Traverse the two sorted lists simultaneously.
+Step 10: Assign each sorted value to the corresponding sorted position.
+Step 11: Print the final array.
+
+6. PSEUDOCODE
+
+READ n, m
+READ array A[1...n]
+
+INITIALIZE DSU for positions 1...n
+
+FOR each edge (u, v):
+    UNION(u, v)
+
+FOR i = 1 TO n:
+    root = FIND(i)
+    STORE (root, i) IN positionList
+    STORE (root, A[i]) IN valueList
+
+SORT positionList BY:
+    1. component root
+    2. position index in ascending order
+
+SORT valueList BY:
+    1. component root
+    2. value in ascending order
+
+FOR i = 1 TO n:
+    position = positionList[i].index
+    value = valueList[i].value
+    A[position] = value
+
+OUTPUT A
+
+7. SAMPLE INPUT
+
+5 3
+5 3 2 4 1
+1 3
+2 3
+4 5
+
+The first line contains n and m.
+The second line contains the array.
+The next m lines contain the allowed-swap edges.
+
+8. SAMPLE OUTPUT
+
+2 3 5 1 4
+
+9. DRY RUN
+
+Initial array:
+
+Index:  1  2  3  4  5
+Value:  5  3  2  4  1
+
+Edges:
+(1, 3)
+(2, 3)
+(4, 5)
+
+Step 1: Find connected components.
+
+Vertices 1 and 3 are connected.
+Vertices 2 and 3 are connected.
+
+Therefore, the first component is:
+
+Component A = {1, 2, 3}
+
+Vertices 4 and 5 are connected:
+
+Component B = {4, 5}
+
+Step 2: Process Component A.
+
+Positions:
+1, 2, 3
+
+Values currently present:
+A[1] = 5
+A[2] = 3
+A[3] = 2
+
+Sort the values:
+
+2, 3, 5
+
+Assign the values to the sorted positions:
+
+A[1] = 2
+A[2] = 3
+A[3] = 5
+
+Step 3: Process Component B.
+
+Positions:
+4, 5
+
+Values currently present:
+A[4] = 4
+A[5] = 1
+
+Sort the values:
+
+1, 4
+
+Assign the values to the sorted positions:
+
+A[4] = 1
+A[5] = 4
+
+Step 4: Construct the final array.
+
+Index:  1  2  3  4  5
+Value:  2  3  5  1  4
+
+Final answer:
+
+2 3 5 1 4
+
+10. CORRECTNESS EXPLANATION
+
+Every allowed swap occurs along an edge. Therefore, a value can move only within the connected component containing its original position.
+
+Within a connected component, any permutation of its values can be achieved through a sequence of swaps along paths. Consequently, the values of each component can be rearranged arbitrarily among its positions.
+
+To minimize the array lexicographically, the smallest available value in a component must be assigned to its smallest index. Otherwise, a smaller value could be placed at an earlier position, producing a lexicographically smaller array.
+
+Applying this reasoning repeatedly means that the component's values must be sorted in ascending order and assigned to its positions in ascending order.
+
+Since values cannot move between components, independently applying this procedure to every component produces the smallest possible array.
+
+Therefore, the algorithm returns the lexicographically smallest array obtainable through the permitted swaps.
+
+11. TIME COMPLEXITY ANALYSIS
+
+Let:
+n = number of array positions
+m = number of graph edges
+
+Initializing the DSU requires O(n) time.
+
+Processing m edges with union by size and path compression takes amortized:
+
+T_DSU = O(m alpha(n))
+
+Constructing the position and value lists requires O(n) time.
+
+Sorting the position list takes O(n log n) time. Sorting the value list also takes O(n log n) time.
+
+Therefore:
+
+T(n, m) = O(n)
+          + O(m alpha(n))
+          + O(n log n)
+          + O(n log n)
+
+Combining the terms:
+
+T(n, m) = O(n log n + m alpha(n))
+
+The sorting operations dominate the running time for many practical inputs.
+
+12. SPACE COMPLEXITY ANALYSIS
+
+The DSU parent and size arrays require O(n) space.
+
+The position list and value list each contain n records, requiring O(n) space apiece.
+
+The original array requires O(n) space.
+
+Therefore:
+
+S(n) = O(n) + O(n) + O(n) + O(n)
+
+S(n) = O(n)
+
+The adjacency information does not need to be stored after all edges have been processed because the algorithm uses the final DSU components to perform the rearrangement.

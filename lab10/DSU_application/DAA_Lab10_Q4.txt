@@ -1,0 +1,312 @@
+DAA LAB 10 — QUESTION 4
+REVERSE TIME-STEP DSU
+
+1. AIM
+
+To determine the maximum sum of vertex weights among connected components after each vertex deletion, using reverse processing and the Disjoint Set Union data structure.
+
+2. PROBLEM UNDERSTANDING
+
+An undirected graph contains V vertices and E edges. Each vertex has an associated weight.
+
+A permutation P specifies the order in which vertices are deleted. After each deletion, the algorithm must report the maximum total weight among all connected components that remain in the graph.
+
+Deleting a vertex also removes all edges incident to it. Consequently, the connected components of the remaining graph may split into smaller components.
+
+Directly processing deletions with DSU is difficult because DSU efficiently supports merging components but does not naturally support splitting an existing component.
+
+The solution is to process the operations in reverse.
+
+3. CONCEPTS USED
+
+3.1 Reverse Processing
+
+Instead of starting with the complete graph and deleting vertices, the algorithm starts with an empty graph and restores vertices in reverse deletion order.
+
+If the original deletion order is:
+
+P[0], P[1], ..., P[V-1]
+
+the reverse process activates:
+
+P[V-1], P[V-2], ..., P[0]
+
+Whenever a vertex is activated, it is connected to its already-active neighbours.
+
+This converts vertex deletion into vertex addition, which DSU can handle efficiently.
+
+3.2 Disjoint Set Union
+
+Each active connected component is represented by a DSU root.
+
+The size array stores the number of vertices in a component, and the sum array stores the total weight of its vertices.
+
+When two active components merge, their sizes and weights are added.
+
+3.3 Maximum Heap
+
+A maximum heap maintains candidate component weights. It allows the algorithm to obtain the largest current component weight without scanning every vertex after every activation.
+
+3.4 Lazy Invalidation
+
+A component may merge into another component, making earlier heap entries invalid.
+
+Each root maintains a version number. Heap entries are checked against the current root and version, and invalid entries are discarded when they reach the top.
+
+4. APPROACH
+
+The algorithm first stores the graph, all vertex weights, and the deletion permutation.
+
+Initially, no vertex is active.
+
+The vertices are then activated in reverse deletion order. Whenever a vertex becomes active:
+
+1. Initialize it as a component of size 1.
+2. Set its component weight to its own vertex weight.
+3. Insert the singleton component into the maximum heap.
+4. Examine its adjacent vertices.
+5. Merge it with every adjacent vertex that is already active.
+6. Obtain the maximum weight among the active components.
+7. Store the result corresponding to the appropriate state of the original deletion process.
+
+The state immediately after deleting P[i] corresponds to the graph formed by activating P[V-1] through P[i+1].
+
+The final deletion leaves an empty graph, so the maximum component weight after that deletion is defined as 0.
+
+5. ALGORITHM
+
+Step 1: Read V, E, all vertex weights, all graph edges, and the deletion order.
+Step 2: Validate that the deletion order contains every vertex exactly once.
+Step 3: Construct an adjacency list for the graph.
+Step 4: Initialize every vertex as inactive.
+Step 5: Set the answer after the final deletion to 0.
+Step 6: Process the deletion order from the last vertex towards the first.
+Step 7: For each activated vertex:
+        a. Mark it active.
+        b. Initialize its DSU component.
+        c. Insert its component weight into the maximum heap.
+        d. Merge it with every active neighbour.
+        e. Find the maximum valid component weight.
+        f. Store the answer for the corresponding original deletion state.
+Step 8: Print the stored answers in the original deletion order.
+
+6. PSEUDOCODE
+
+READ vertex weights, graph edges, and deletion permutation P
+
+INITIALIZE all vertices as INACTIVE
+INITIALIZE DSU arrays
+INITIALIZE MAX_HEAP
+
+answer[V - 1] = 0
+
+FOR i = V - 1 DOWNTO 1:
+    u = P[i]
+
+    MARK u as ACTIVE
+    parent[u] = u
+    size[u] = 1
+    sum[u] = weight[u]
+    version[u] = version[u] + 1
+
+    INSERT (sum[u], u, version[u]) INTO MAX_HEAP
+
+    FOR each neighbour v of u:
+        IF v is ACTIVE:
+            UNION(u, v)
+
+    answer[i - 1] = GET_MAXIMUM()
+
+OUTPUT answer[0], answer[1], ..., answer[V - 1]
+
+FUNCTION UNION(u, v):
+    rootU = FIND(u)
+    rootV = FIND(v)
+
+    IF rootU == rootV:
+        RETURN
+
+    IF size[rootU] < size[rootV]:
+        SWAP rootU, rootV
+
+    parent[rootV] = rootU
+    size[rootU] = size[rootU] + size[rootV]
+    sum[rootU] = sum[rootU] + sum[rootV]
+
+    INCREMENT version[rootU]
+    INCREMENT version[rootV]
+
+    INSERT (sum[rootU], rootU, version[rootU]) INTO MAX_HEAP
+
+FUNCTION GET_MAXIMUM():
+    WHILE MAX_HEAP is not empty:
+        entry = TOP(MAX_HEAP)
+
+        IF entry.root is ACTIVE
+           AND entry.root is a current root
+           AND entry.version == version[entry.root]:
+            RETURN entry.weight
+
+        REMOVE TOP(MAX_HEAP)
+
+    RETURN 0
+
+7. SAMPLE INPUT
+
+4 2
+5 2 8 4
+1 2
+3 4
+3 4 1 2
+
+The first line contains V and E.
+The second line contains the weights of vertices 1 through V.
+The next E lines contain the graph edges.
+The final line gives the deletion order.
+
+8. SAMPLE OUTPUT
+
+7
+7
+2
+0
+
+9. DRY RUN
+
+Vertex weights:
+
+Vertex 1 = 5
+Vertex 2 = 2
+Vertex 3 = 8
+Vertex 4 = 4
+
+Graph edges:
+(1, 2)
+(3, 4)
+
+Deletion order:
+3, 4, 1, 2
+
+Forward deletion process:
+
+Initially, the graph contains two components:
+{1, 2}, with total weight 7
+{3, 4}, with total weight 12
+
+Deletion 1: Delete vertex 3.
+
+Vertex 3 and its incident edge are removed. Vertex 4 becomes isolated.
+
+Remaining components:
+{1, 2}, weight 7
+{4}, weight 4
+
+Maximum weight = 7
+
+Deletion 2: Delete vertex 4.
+
+The remaining graph contains only vertices 1 and 2, connected by an edge.
+
+Maximum weight = 5 + 2 = 7
+
+Deletion 3: Delete vertex 1.
+
+Only vertex 2 remains.
+
+Maximum weight = 2
+
+Deletion 4: Delete vertex 2.
+
+No vertices remain.
+
+Maximum weight = 0
+
+Therefore, for the stated deletion order, the correct answers are:
+
+7
+7
+2
+0
+
+10. REVERSE-PROCESSING DRY RUN
+
+The reverse activation order is:
+
+2, 1, 4, 3
+
+Initially, all vertices are inactive.
+
+Activate vertex 2:
+Component {2}, weight 2.
+
+Activate vertex 1:
+Vertex 1 is connected to active vertex 2.
+The components merge into {1, 2}, with total weight 7.
+
+This represents the graph remaining after deleting vertex 3.
+
+The maximum component weight is 7.
+
+Activate vertex 4:
+Vertex 4 is connected to active vertex 3 only after vertex 3 is activated; until then, it remains a separate component.
+
+Activate vertex 3:
+Vertex 3 connects to vertex 4, forming component {3, 4} with total weight 12. This is the complete graph before any deletion.
+
+For the stated deletion order 3, 4, 1, 2, the forward answers after each deletion are 7, 7, 2, and 0. Store each reverse-process result at the matching forward-deletion index, then print the answers in original order.
+
+11. CORRECTNESS EXPLANATION
+
+Initially, the reverse process has no active vertices, corresponding to the graph after all vertices have been deleted.
+
+When a vertex is activated, it is connected to every neighbour that is already active. Every edge between active vertices is therefore accounted for when its second endpoint becomes active.
+
+DSU correctly maintains the connected components of the active graph. The sum array is updated whenever two components merge, so each component weight remains equal to the sum of its active vertex weights.
+
+The maximum heap returns the greatest weight among the current components after invalid entries are discarded.
+
+The active graph after restoring vertices in reverse order is identical to the graph remaining after the corresponding forward deletions. By storing the result at the matching index, the algorithm produces the correct answer after each original deletion.
+
+12. TIME COMPLEXITY ANALYSIS
+
+Let:
+V = number of vertices
+E = number of edges
+
+Reading the graph and initializing the arrays requires O(V + E) time.
+
+Each vertex is activated once, and each undirected edge is examined at most twice through the adjacency lists.
+
+DSU operations across all activations require:
+
+T_DSU = O((V + E) alpha(V))
+
+There are V heap insertions for activated singleton components and at most V - 1 successful component merges. Therefore, the number of heap insertions is O(V).
+
+Every heap insertion or removal takes O(log V) time because the number of inserted entries is O(V). Each entry is removed at most once.
+
+T_heap = O(V log V)
+
+Thus, the overall time complexity is:
+
+T(V, E) = O(V + E)
+          + O((V + E) alpha(V))
+          + O(V log V)
+
+Therefore:
+
+T(V, E) = O((V + E) alpha(V) + V log V)
+
+13. SPACE COMPLEXITY ANALYSIS
+
+The adjacency-list representation requires O(V + E) space.
+
+The DSU arrays, vertex weights, active flags, version numbers, deletion order, and answer array require O(V) space.
+
+The maximum heap contains O(V) entries because there are V activations and at most V - 1 successful merges.
+
+Therefore:
+
+S(V, E) = O(V + E) + O(V) + O(V)
+
+S(V, E) = O(V + E)

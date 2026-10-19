@@ -1,0 +1,212 @@
+DAA LAB 10 — QUESTION 1
+ONLINE GRAPH-BIPARTITENESS TESTING
+
+1. AIM
+
+To design and implement an online algorithm that processes the edges of an undirected graph one at a time. An edge is accepted if adding it preserves the bipartite property; otherwise, it is rejected because it creates an odd cycle.
+
+2. PROBLEM UNDERSTANDING
+
+A graph is bipartite if its vertices can be divided into two disjoint sets such that every edge connects a vertex in one set to a vertex in the other set.
+
+Equivalently, a graph is bipartite if and only if it contains no odd-length cycle.
+
+In the online version, edges arrive sequentially. After processing each edge, the algorithm must decide whether that edge can be accepted without making the graph non-bipartite.
+
+The algorithm must maintain the graph's bipartite property throughout the process instead of waiting until all edges have arrived.
+
+3. CONCEPTS USED
+
+3.1 Disjoint Set Union (DSU)
+
+Disjoint Set Union maintains a collection of connected components. Each component has a representative, also called its root.
+
+The find operation identifies the representative of a vertex. The union operation combines two components.
+
+Path compression and union by size are used to improve performance.
+
+3.2 Parity Information
+
+Along with the parent of each vertex, the algorithm maintains parity[x], which represents the colour difference between vertex x and its parent.
+
+A parity value of 0 means both vertices belong to the same colour class, while 1 means they belong to opposite colour classes.
+
+After path compression, parity[x] represents the colour difference between x and the root of its component.
+
+3.3 Bipartite Constraint
+
+For every accepted edge (u, v), the endpoints must have opposite colours.
+
+Therefore:
+
+colour(u) XOR colour(v) = 1
+
+The XOR operation is used because it conveniently represents whether two vertices have equal or different colours.
+
+4. APPROACH
+
+Initially, every vertex belongs to a separate component. Each vertex is its own parent, and its parity is 0.
+
+For every incoming edge (u, v):
+
+1. Find the roots of u and v and determine their parities relative to their roots.
+2. If both vertices already belong to the same component, check their parity.
+3. If their parities are equal, the edge requires them to have the same colour, contradicting the requirement that adjacent vertices have different colours. Reject the edge.
+4. If their parities differ, the existing component remains bipartite. Accept the edge.
+5. If the vertices belong to different components, merge the components and assign the appropriate parity to the attached root so that u and v have opposite colours.
+
+A rejected edge is not added to the maintained graph.
+
+5. ALGORITHM
+
+Step 1: Initialize each vertex as its own parent.
+Step 2: Set the size of every component to 1 and all parity values to 0.
+Step 3: Read the next edge (u, v).
+Step 4: Use find() to obtain the roots and parity values of both endpoints.
+Step 5: If the roots are equal:
+        a. If the endpoint parities are equal, reject the edge.
+        b. Otherwise, accept the edge.
+Step 6: If the roots are different:
+        a. Merge the smaller component into the larger component.
+        b. Update the parity of the attached root.
+        c. Accept the edge.
+Step 7: Repeat Steps 3–6 for every incoming edge.
+
+6. PSEUDOCODE
+
+INITIALIZE DSU for every vertex
+SET parent[v] = v
+SET size[v] = 1
+SET parity[v] = 0
+
+FUNCTION FIND(x):
+    IF parent[x] != x:
+        oldParent = parent[x]
+        parent[x] = FIND(oldParent)
+        parity[x] = parity[x] XOR parity[oldParent]
+    RETURN parent[x]
+
+FUNCTION ADD_EDGE(u, v):
+    rootU = FIND(u)
+    parityU = parity[u]
+
+    rootV = FIND(v)
+    parityV = parity[v]
+
+    IF rootU == rootV:
+        IF parityU == parityV:
+            RETURN REJECT
+        ELSE:
+            RETURN ACCEPT
+
+    IF size[rootU] < size[rootV]:
+        SWAP rootU, rootV
+        SWAP parityU, parityV
+
+    parent[rootV] = rootU
+    parity[rootV] = parityU XOR parityV XOR 1
+    size[rootU] = size[rootU] + size[rootV]
+
+    RETURN ACCEPT
+
+FOR each incoming edge (u, v):
+    result = ADD_EDGE(u, v)
+    PRINT result
+
+7. SAMPLE INPUT
+
+5 5
+1 2
+2 3
+3 4
+4 1
+4 5
+
+The first line contains the number of vertices and incoming edges.
+Each subsequent line contains one undirected edge.
+
+8. SAMPLE OUTPUT
+
+ACCEPT
+ACCEPT
+ACCEPT
+ACCEPT
+ACCEPT
+
+All five edges are accepted because the graph remains bipartite.
+
+9. DRY RUN
+
+Initially, all five vertices belong to separate components.
+
+Edge 1: (1, 2)
+Vertices 1 and 2 are in different components. The components are merged and the edge is accepted.
+
+Edge 2: (2, 3)
+Vertices 2 and 3 belong to different components. Their components are merged while maintaining opposite colours. The edge is accepted.
+
+Edge 3: (3, 4)
+The components are merged again. The edge is accepted.
+
+Edge 4: (4, 1)
+This edge creates the cycle 1–2–3–4–1, which has four edges. Since the cycle is even, the graph remains bipartite. The edge is accepted.
+
+Edge 5: (4, 5)
+Vertex 5 belongs to a separate component. It is merged with the component containing vertex 4. The edge is accepted.
+
+To demonstrate rejection, consider adding the edge (1, 3) after the first three edges have been accepted. Vertices 1 and 3 would have the same colour because they are connected by a path of two edges. Adding (1, 3) would create a triangle, which is an odd cycle. Therefore, that edge must be rejected.
+
+10. CORRECTNESS EXPLANATION
+
+The algorithm maintains the invariant that every accepted connected component is bipartite.
+
+Initially, every component contains one vertex and is therefore bipartite.
+
+If an incoming edge joins two different components, the components can be merged by reversing the colour assignment of one component when necessary. This ensures that the two endpoints of the new edge have opposite colours.
+
+If both endpoints already belong to the same component, their relative parity determines whether the new edge is valid. Different parities mean the endpoints already have opposite colours, so the edge is accepted. Equal parities mean the endpoints have the same colour; adding the edge would create an odd cycle, so it is rejected.
+
+Thus, every accepted edge preserves bipartiteness, and every rejected edge would violate it.
+
+11. TIME COMPLEXITY ANALYSIS
+
+Let:
+V = number of vertices
+E = number of incoming edges
+
+Initialization requires one operation for every vertex:
+
+T_initialization = O(V)
+
+Each incoming edge requires a constant number of DSU find operations and, when necessary, one union operation.
+
+With path compression and union by size, the amortized cost of each DSU operation is O(alpha(V)), where alpha(V) is the inverse Ackermann function.
+
+For E edges:
+
+T_edges = O(E alpha(V))
+
+Therefore, the total time complexity is:
+
+T(V, E) = O(V) + O(E alpha(V))
+
+T(V, E) = O(V + E alpha(V))
+
+The inverse Ackermann function grows extremely slowly, so the DSU operations are practically constant time for ordinary input sizes.
+
+12. SPACE COMPLEXITY ANALYSIS
+
+The algorithm maintains three arrays:
+- parent[] of size V
+- size[] of size V
+- parity[] of size V
+
+Each array requires O(V) space.
+
+Therefore:
+
+S(V) = O(V) + O(V) + O(V)
+
+S(V) = O(V)
+
+The algorithm does not need to store the entire graph because it processes each edge as it arrives.

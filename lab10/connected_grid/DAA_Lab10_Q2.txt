@@ -1,0 +1,227 @@
+DAA LAB 10 — QUESTION 2
+DYNAMIC CONNECTED COMPONENTS IN A GRID (NUMBER OF ISLANDS II)
+
+1. AIM
+
+To determine the number of islands in a grid after each land-addition operation using the Disjoint Set Union (DSU) data structure.
+
+2. PROBLEM UNDERSTANDING
+
+An initially empty R × C grid contains only water cells. Each operation converts one cell into land.
+
+An island is a connected group of land cells. Two land cells are connected if they share a side: above, below, left, or right. Diagonal adjacency does not count.
+
+After every operation, the algorithm must report the total number of islands.
+
+If a cell is converted into land more than once, the number of islands does not change because the cell is already land.
+
+3. CONCEPTS USED
+
+3.1 Disjoint Set Union
+
+DSU maintains the connected components of land cells. Every island corresponds to one DSU component.
+
+The find operation identifies the component representative, while union combines two components.
+
+3.2 Grid-to-Array Mapping
+
+A two-dimensional cell (r, c) is mapped to a one-dimensional index:
+
+id = r × C + c
+
+This allows the grid to be represented using one-dimensional arrays for DSU operations.
+
+3.3 Island Count Maintenance
+
+Whenever a new water cell becomes land, the island count increases by one.
+
+For every neighbouring cell that is already land, the algorithm attempts to merge the two components. If the components are different, the island count decreases by one.
+
+A union operation that does not merge two different components does not affect the island count.
+
+4. APPROACH
+
+Initially, every cell is water and the island count is zero.
+
+For each land-addition operation:
+
+1. Convert the given cell coordinates into a one-dimensional index.
+2. If the cell is already land, report the existing island count.
+3. Otherwise, mark it as land and increase the island count by one.
+4. Examine its four neighbouring cells.
+5. For each valid neighbour that is already land, attempt a DSU union.
+6. Decrease the island count whenever two previously separate components are merged.
+7. Report the updated count.
+
+The algorithm uses only the four orthogonal neighbours, not diagonal neighbours.
+
+5. ALGORITHM
+
+Step 1: Read the number of rows R, columns C, and operations K.
+Step 2: Initialize all cells as water.
+Step 3: Initialize the island count to zero.
+Step 4: For each operation (r, c):
+        a. Check whether the coordinates are valid.
+        b. If the cell is already land, output the current count.
+        c. Otherwise, mark the cell as land and increment the count.
+        d. Examine the top, bottom, left, and right neighbours.
+        e. For each neighbouring land cell, merge the components if they are different.
+        f. Decrement the count after each successful merge.
+        g. Output the current island count.
+Step 5: Release dynamically allocated memory.
+
+6. PSEUDOCODE
+
+INITIALIZE every cell as WATER
+INITIALIZE DSU for all grid positions
+islands = 0
+
+FOR each operation (r, c):
+    IF (r, c) is outside the grid:
+        REPORT INVALID INPUT
+
+    id = r * C + c
+
+    IF cell (r, c) is already LAND:
+        OUTPUT islands
+        CONTINUE
+
+    MARK cell (r, c) as LAND
+    islands = islands + 1
+
+    FOR each of the four directions:
+        nr = r + rowOffset
+        nc = c + columnOffset
+
+        IF (nr, nc) is inside the grid:
+            IF cell (nr, nc) is LAND:
+                neighbour = nr * C + nc
+
+                IF FIND(id) != FIND(neighbour):
+                    UNION(id, neighbour)
+                    islands = islands - 1
+
+    OUTPUT islands
+
+7. SAMPLE INPUT
+
+3 3 5
+0 0
+0 1
+1 2
+2 1
+1 1
+
+The first line contains the number of rows, columns, and operations.
+The remaining lines contain zero-based cell coordinates.
+
+8. SAMPLE OUTPUT
+
+1 1 2 3 1
+
+9. DRY RUN
+
+The grid initially contains only water, so islands = 0.
+
+Operation 1: Add land at (0, 0)
+
+The cell was water. The island count becomes 1.
+There are no neighbouring land cells.
+
+Island count = 1
+
+Operation 2: Add land at (0, 1)
+
+The cell becomes land, increasing the count to 2.
+Its left neighbour (0, 0) is land. The two cells are merged into one component, reducing the count to 1.
+
+Island count = 1
+
+Operation 3: Add land at (1, 2)
+
+The cell becomes land and creates a new island.
+
+Island count = 2
+
+Operation 4: Add land at (2, 1)
+
+The cell becomes land and creates another island. It is not side-connected to the existing land cells.
+
+Island count = 3
+
+Operation 5: Add land at (1, 1)
+
+The cell becomes land, initially increasing the count to 4.
+
+It is adjacent to (0, 1), (1, 2), and (2, 1). These three land cells belong to three separate components before the new cell is processed.
+
+The first successful union reduces the count to 3.
+The second successful union reduces it to 2.
+The third successful union reduces it to 1.
+
+The four connected land cells now form one island, while the component at (0, 0) is connected through (0, 1) and is part of the same island.
+
+Final island count = 1
+
+The sequence of counts is:
+
+1, 1, 2, 3, 1
+
+10. CORRECTNESS EXPLANATION
+
+Initially, the grid contains no land, so the island count is correctly initialized to zero.
+
+Whenever a water cell becomes land, it creates one new connected component. Therefore, increasing the count by one is correct.
+
+Each adjacent land cell may belong to the same component or a different component. If the components are different, merging them combines two islands into one, so the count must decrease by one. If they already belong to the same component, no new connection between distinct islands is created, and the count remains unchanged.
+
+The algorithm examines all four possible side-neighbours of every newly added cell. Consequently, every connection introduced by that operation is considered.
+
+By maintaining the number of components through these increments and decrements, the algorithm correctly reports the number of islands after every operation.
+
+11. TIME COMPLEXITY ANALYSIS
+
+Let:
+R = number of rows
+C = number of columns
+N = R × C = total number of grid cells
+K = number of operations
+
+Initializing the DSU arrays and land-status array requires O(N) time.
+
+For each operation, the algorithm examines at most four neighbouring cells. Therefore, each operation performs at most four find/union attempts.
+
+With path compression and union by size, each DSU operation takes amortized O(alpha(N)) time.
+
+The total time for K operations is:
+
+T_operations = O(K alpha(N))
+
+Including initialization:
+
+T(R, C, K) = O(N) + O(K alpha(N))
+
+Since N = R × C:
+
+T(R, C, K) = O(RC + K alpha(RC))
+
+12. SPACE COMPLEXITY ANALYSIS
+
+The algorithm maintains:
+- parent[]: N entries
+- size[]: N entries
+- land[]: N entries
+
+Each array requires O(N) space.
+
+Therefore:
+
+S(N) = O(N) + O(N) + O(N)
+
+S(N) = O(N)
+
+Since N = R × C:
+
+S(R, C) = O(RC)
+
+The space complexity is independent of the number of operations because the algorithm stores the current grid state rather than the complete operation history.
