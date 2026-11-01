@@ -1,0 +1,404 @@
+DAA LAB 11
+QUESTION 2
+MULTI-SOURCE BFS FOR RADIUS-CONSTRAINED VORONOI CELL PARTITIONING
+=================================================================
+
+1. PROBLEM DESCRIPTION
+
+An unweighted, undirected graph G = (V, E) is given along with K
+designated hub vertices:
+
+    H = {h1, h2, ..., hK}
+
+Each hub has an index from 1 to K. An integer radius R is also given.
+
+Every vertex must be assigned to its nearest hub, subject to the
+following rules:
+
+1. The distance is the shortest-path distance measured in number of
+   edges.
+2. If the minimum distance is greater than R, the vertex is outside
+   the coverage area and receives owner = -1.
+3. Otherwise, the vertex is assigned to the nearest hub.
+4. If multiple hubs have the same minimum distance, the hub with the
+   smallest numerical index wins.
+
+The output consists of the owner and minimum distance for every vertex.
+
+2. CONCEPTS USED
+
+2.1 Breadth-First Search
+
+BFS is used to find shortest paths in unweighted graphs.
+
+It explores vertices level by level:
+    Level 0: Source
+    Level 1: Vertices one edge away
+    Level 2: Vertices two edges away
+    ...
+
+Because all edges have equal cost, the first discovery of a vertex
+gives its shortest distance from the source.
+
+2.2 Multi-Source BFS
+
+Ordinary BFS begins with one source vertex. Multi-Source BFS begins
+with several sources simultaneously.
+
+All hubs are inserted into the same queue initially, each with
+distance zero.
+
+The search then expands outwards from all hubs together. The first
+distance assigned to a vertex is its minimum distance from any hub.
+
+This is more efficient than running a separate BFS from every hub.
+
+2.3 Deterministic tie-breaking
+
+Two or more hubs may reach a vertex at the same minimum distance.
+
+The problem requires selecting the smallest hub index.
+
+A reliable solution uses two phases:
+
+    Phase 1:
+        Calculate the minimum distance from any hub.
+
+    Phase 2:
+        Determine the smallest-index hub that can reach each vertex
+        at that minimum distance.
+
+For a vertex v at distance d > 0, every shortest path to v must come
+from a neighboring vertex whose distance is d - 1.
+
+Therefore, its owner is:
+
+    owner[v] = minimum owner[u]
+
+    over all neighbors u for which dist[u] = dist[v] - 1.
+
+Since phase 2 processes vertices in BFS order, all such preceding-layer
+vertices have already received their correct ownership labels.
+
+3. ALGORITHM
+
+PHASE 1: MINIMUM DISTANCE CALCULATION
+
+1. Represent the undirected graph using adjacency lists.
+2. Initialize dist[v] = -1 for every vertex.
+3. Initialize owner[v] = -1 for every vertex.
+4. Insert all hubs into the queue in increasing hub-index order.
+5. Set the distance of every hub to zero.
+6. Perform BFS:
+      a. Remove vertex u from the queue.
+      b. If dist[u] = R, do not explore its neighbors.
+      c. Otherwise, examine every neighbor v.
+      d. If dist[v] is still -1:
+             Set dist[v] = dist[u] + 1.
+             Insert v into the queue.
+
+The BFS only discovers vertices within the required radius.
+
+PHASE 2: OWNERSHIP ASSIGNMENT
+
+1. Assign each hub its own index.
+2. Process all reached vertices in the order in which they were
+   removed from the BFS queue.
+3. Hub vertices already have their owner and are skipped.
+4. For each other vertex u:
+      a. Examine every neighbor v.
+      b. Consider only neighbors satisfying:
+             dist[v] = dist[u] - 1
+      c. Find the smallest owner[v] among these neighbors.
+      d. Assign that value to owner[u].
+5. Print owner and distance for every vertex.
+6. Vertices not reached within radius R are printed as -1, -1.
+
+4. PSEUDOCODE
+
+MULTI-SOURCE-BFS(G, H, R):
+
+    for every vertex v:
+        dist[v] = -1
+        owner[v] = -1
+
+    create an empty queue
+
+    for each hub hi in increasing index order:
+        dist[hi] = 0
+        enqueue(hi)
+
+    // Phase 1: Minimum distances
+
+    while queue is not empty:
+
+        u = dequeue()
+
+        if dist[u] == R:
+            continue
+
+        for every neighbor v of u:
+
+            if dist[v] == -1:
+                dist[v] = dist[u] + 1
+                enqueue(v)
+
+    // Phase 2: Ownership
+
+    for i = 1 to K:
+        owner[hi] = i
+
+    for every vertex u in BFS removal order:
+
+        if dist[u] == 0:
+            continue
+
+        bestOwner = -1
+
+        for every neighbor v of u:
+
+            if dist[v] == dist[u] - 1:
+
+                if bestOwner == -1 OR owner[v] < bestOwner:
+                    bestOwner = owner[v]
+
+        owner[u] = bestOwner
+
+    for every vertex v:
+
+        if dist[v] == -1:
+            print v, -1, -1
+        else:
+            print v, owner[v], dist[v]
+
+5. SAMPLE INPUT
+
+8 8
+1 3
+2 3
+3 4
+4 5
+5 6
+6 7
+2 8
+8 7
+2 3
+1 7
+
+Input interpretation:
+
+    Number of vertices V = 8
+    Number of edges E = 8
+
+    Undirected edges:
+        1 - 3
+        2 - 3
+        3 - 4
+        4 - 5
+        5 - 6
+        6 - 7
+        2 - 8
+        8 - 7
+
+    Number of hubs K = 2
+    Radius R = 3
+
+    Hub 1 = vertex 1
+    Hub 2 = vertex 7
+
+6. SAMPLE OUTPUT
+
+Vertex  Owner  Distance
+1       1      0
+2       1      2
+3       1      1
+4       1      2
+5       2      2
+6       2      1
+7       2      0
+8       2      1
+
+7. DRY RUN
+
+The two hubs are:
+    Hub 1 = vertex 1
+    Hub 2 = vertex 7
+
+PHASE 1: DISTANCE CALCULATION
+
+Initially, vertices 1 and 7 are inserted into the queue.
+
+    dist[1] = 0
+    dist[7] = 0
+
+The BFS expands from both hubs.
+
+From vertex 1:
+    Vertex 3 is reached at distance 1.
+
+From vertex 7:
+    Vertex 6 is reached at distance 1.
+    Vertex 8 is reached at distance 1.
+
+From vertex 3:
+    Vertex 2 is reached at distance 2.
+    Vertex 4 is reached at distance 2.
+
+From vertex 6:
+    Vertex 5 is reached at distance 2.
+
+Vertex 8 may also lead to vertex 2, but vertex 2 already has
+distance 2. Therefore, its distance is not changed.
+
+The minimum distances are:
+
+    Vertex 1: 0
+    Vertex 2: 2
+    Vertex 3: 1
+    Vertex 4: 2
+    Vertex 5: 2
+    Vertex 6: 1
+    Vertex 7: 0
+    Vertex 8: 1
+
+All vertices are within radius R = 3.
+
+PHASE 2: OWNERSHIP ASSIGNMENT
+
+Hub vertices:
+    owner[1] = 1
+    owner[7] = 2
+
+Vertex 3:
+    Its preceding-layer neighbor is vertex 1.
+    owner[3] = 1
+
+Vertex 6:
+    Its preceding-layer neighbor is vertex 7.
+    owner[6] = 2
+
+Vertex 8:
+    Its preceding-layer neighbor is vertex 7.
+    owner[8] = 2
+
+Vertex 2:
+    Its preceding-layer neighbors are vertices 3 and 8.
+    owner[3] = 1
+    owner[8] = 2
+
+    The smallest index is 1.
+    Therefore owner[2] = 1.
+
+This demonstrates deterministic tie-breaking because vertex 2 is
+equidistant from both hubs.
+
+Vertex 4:
+    Its preceding-layer neighbor is vertex 3.
+    owner[4] = 1
+
+Vertex 5:
+    Its preceding-layer neighbor is vertex 6.
+    owner[5] = 2
+
+The final ownership array is:
+
+    owner = [1, 1, 1, 1, 2, 2, 2, 2]
+
+8. COMPLEXITY ANALYSIS
+
+Let V be the number of vertices, E the number of undirected edges,
+and K the number of hubs.
+
+8.1 Time complexity
+
+PHASE 1: Multi-Source BFS
+
+Initializing the distance and owner arrays takes O(V).
+
+Inserting all hubs takes O(K).
+
+Every vertex is inserted into the BFS queue at most once, requiring
+O(V) total queue operations.
+
+Every undirected edge is represented by two adjacency-list entries.
+Across the entire BFS, the adjacency lists are scanned in O(2E),
+which simplifies to O(E).
+
+Therefore:
+
+    T1(V, E) = O(V + K + E)
+
+Since K <= V:
+
+    T1(V, E) = O(V + E)
+
+PHASE 2: Ownership assignment
+
+Initializing ownership for all hubs takes O(K).
+
+Every reached vertex is processed once. Its adjacency list is scanned
+to find the smallest owner among neighbors in the preceding BFS layer.
+
+Across all vertices, the total number of adjacency-list entries
+examined is at most 2E.
+
+Therefore:
+
+    T2(V, E) = O(K + V + E)
+             = O(V + E)
+
+TOTAL TIME
+
+    T(V, E) = T1(V, E) + T2(V, E)
+            = O(V + E) + O(V + E)
+
+    T(V, E) = O(V + E)
+
+Time Complexity: O(V + E)
+
+8.2 Space complexity
+
+Adjacency lists require O(V + E).
+Distance array requires O(V).
+Ownership array requires O(V).
+BFS queue requires O(V).
+Hub array requires O(K).
+
+Since K <= V:
+
+    S(V, E) = O(V + E)
+
+Space Complexity: O(V + E)
+
+9. IMPORTANT EDGE CASES
+
+1. Radius R = 0:
+   Only the hub vertices themselves are assigned.
+
+2. Multiple hubs:
+   All hubs are initialized as BFS sources simultaneously.
+
+3. Equal-distance vertices:
+   The smallest numerical hub index is selected.
+
+4. Disconnected graph:
+   Vertices not connected to any hub remain unassigned.
+
+5. Vertices outside the radius:
+   They receive owner = -1 and distance = -1 in the implementation.
+
+6. A vertex that is itself a hub:
+   Its distance is zero and its owner is its own hub index.
+
+7. Multiple hubs in the same vertex:
+   The input must reject duplicate hub vertices because the problem
+   specifies a set of designated hubs.
+
+10. CONCLUSION
+
+Multi-Source BFS calculates the distance from the nearest hub without
+running a separate BFS for every hub. A second pass assigns ownership
+using the preceding BFS layer, ensuring that equal-distance ties are
+resolved in favour of the smallest hub index.
+
+The algorithm runs in O(V + E) time and O(V + E) space.

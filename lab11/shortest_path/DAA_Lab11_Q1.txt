@@ -1,0 +1,329 @@
+DAA LAB 11
+QUESTION 1
+SHORTEST PATH ON PARITY-CONSTRAINED GRAPHS VIA 0-1 BFS
+=====================================================
+
+1. PROBLEM DESCRIPTION
+
+A directed graph G = (V, E) is given along with a source vertex S and a
+non-negative penalty C. Every edge has weight either 0 or 1.
+
+For a path P:
+    W(P)  = sum of the edge weights in P
+    k1(P) = number of edges having weight 1 in P
+
+The effective cost is:
+
+    Cost(P) = W(P),       if k1(P) is even
+              W(P) + C,   if k1(P) is odd
+
+The objective is to find the minimum effective cost from S to every
+vertex. Vertices that cannot be reached must be reported as unreachable.
+
+2. CONCEPTS USED
+
+2.1 Why ordinary shortest-path storage is insufficient
+
+In a conventional shortest-path problem, storing one distance for each
+vertex is sufficient. Here, the final cost also depends on the parity
+(even or odd) of the number of weight-1 edges used.
+
+Two paths may reach the same vertex with different parities. Even if one
+path has a smaller accumulated weight, the other path may produce a
+smaller final effective cost after the penalty is considered.
+
+Therefore, the algorithm must retain two separate states for every
+vertex.
+
+2.2 Expanded state graph
+
+Each original vertex v is represented by two states:
+
+    (v, 0): v reached using an even number of weight-1 edges.
+    (v, 1): v reached using an odd number of weight-1 edges.
+
+Let dist[v][p] be the minimum accumulated edge weight required to reach
+vertex v with parity p.
+
+For an original directed edge u -> v of weight w:
+
+    nextParity = parity XOR w
+    newDistance = dist[u][parity] + w
+
+If w = 0, parity does not change.
+If w = 1, parity changes from even to odd or odd to even.
+
+The expanded graph therefore contains 2V states and 2E transitions.
+
+2.3 0-1 BFS
+
+0-1 BFS is a shortest-path algorithm designed for graphs whose edge
+weights are restricted to 0 and 1.
+
+It uses a double-ended queue (deque):
+
+    - A successful relaxation through a weight-0 edge is inserted at
+      the front.
+    - A successful relaxation through a weight-1 edge is inserted at
+      the back.
+
+This ordering processes low-cost transitions before higher-cost
+transitions and gives linear-time shortest-path computation.
+
+A dynamically growing deque should be used so that the implementation
+does not depend on an unsafe fixed capacity.
+
+3. ALGORITHM
+
+1. Represent the directed graph using adjacency lists.
+2. Create a distance array dist[V + 1][2].
+3. Initialize both parity distances of every vertex to infinity.
+4. Set dist[S][0] = 0 because the source initially uses zero
+   weight-1 edges.
+5. Insert state (S, 0) into the deque.
+6. While the deque is not empty:
+      a. Remove a state (u, parity) from the front.
+      b. Examine every outgoing edge u -> v with weight w.
+      c. Calculate nextParity = parity XOR w.
+      d. Calculate newDistance = dist[u][parity] + w.
+      e. If newDistance improves dist[v][nextParity]:
+             Update the distance.
+             If w = 0, insert the new state at the front.
+             Otherwise, insert it at the back.
+7. For every vertex v:
+      If both parity states are unreachable, report unreachable.
+      Otherwise calculate:
+          answer[v] = min(dist[v][0], dist[v][1] + C)
+      An infinite state is ignored when taking this minimum.
+
+4. PSEUDOCODE
+
+ZERO-ONE-BFS(G, S, C):
+
+    for every vertex v:
+        dist[v][0] = INFINITY
+        dist[v][1] = INFINITY
+
+    dist[S][0] = 0
+    create an empty deque
+    push_front(deque, (S, 0))
+
+    while deque is not empty:
+
+        (u, parity) = pop_front(deque)
+
+        for every edge (u, v, w):
+
+            nextParity = parity XOR w
+            newDistance = dist[u][parity] + w
+
+            if newDistance < dist[v][nextParity]:
+
+                dist[v][nextParity] = newDistance
+
+                if w == 0:
+                    push_front(deque, (v, nextParity))
+                else:
+                    push_back(deque, (v, nextParity))
+
+    for every vertex v:
+
+        if dist[v][0] and dist[v][1] are INFINITY:
+            report v as UNREACHABLE
+        else:
+            evenCost = dist[v][0]
+            oddCost = dist[v][1] + C
+            answer[v] = minimum valid value of evenCost and oddCost
+
+            print answer[v]
+
+5. FINAL COST FORMULA
+
+The penalty is not an edge weight. It is applied once, after the
+shortest accumulated weights for both parity states have been found.
+
+For a vertex v:
+
+    answer[v] = min(dist[v][0], dist[v][1] + C)
+
+This formula follows directly from the two possible cases:
+
+    Even number of weight-1 edges:
+        Effective cost = accumulated weight
+
+    Odd number of weight-1 edges:
+        Effective cost = accumulated weight + C
+
+If a parity state is unreachable, its distance is treated as infinity.
+
+6. SAMPLE INPUT
+
+5 5 1 4
+1 2 1
+1 3 0
+2 4 0
+3 4 1
+4 5 1
+
+Input interpretation:
+    V = 5
+    E = 5
+    Source S = 1
+    Penalty C = 4
+
+The graph is directed. Each edge is given as:
+    source_vertex destination_vertex weight
+
+7. SAMPLE OUTPUT
+
+Minimum effective costs:
+Vertex 1: 0
+Vertex 2: 5
+Vertex 3: 0
+Vertex 4: 2
+Vertex 5: 2
+
+8. DRY RUN
+
+Source = 1 and C = 4.
+
+Initial state:
+    dist[1][0] = 0
+    All other parity states = INFINITY
+
+From vertex 1:
+
+    Edge 1 -> 2 has weight 1.
+        New parity = 0 XOR 1 = 1
+        dist[2][1] = 1
+
+    Edge 1 -> 3 has weight 0.
+        New parity = 0 XOR 0 = 0
+        dist[3][0] = 0
+
+From vertex 2:
+
+    Edge 2 -> 4 has weight 0.
+        dist[4][1] = 1
+
+From vertex 3:
+
+    Edge 3 -> 4 has weight 1.
+        New parity = 0 XOR 1 = 1
+        This also gives dist[4][1] = 1, so it does not improve
+        the existing value.
+
+From vertex 4:
+
+    Edge 4 -> 5 has weight 1.
+        New parity = 1 XOR 1 = 0
+        dist[5][0] = 2
+
+The final parity distances and effective costs are:
+
+    Vertex 1:
+        Even = 0, Odd = INFINITY
+        Answer = 0
+
+    Vertex 2:
+        Even = INFINITY, Odd = 1
+        Answer = 1 + 4 = 5
+
+    Vertex 3:
+        Even = 0, Odd = INFINITY
+        Answer = 0
+
+    Vertex 4:
+        Even = INFINITY, Odd = 1
+        Answer = 1 + 4 = 5
+
+    Vertex 5:
+        Even = 2, Odd = INFINITY
+        Answer = 2
+
+IMPORTANT:
+The edge 3 -> 4 has weight 1, and the edge 2 -> 4 has weight 0.
+Both paths to vertex 4 have odd parity and accumulated weight 1.
+Thus the correct effective cost for vertex 4 is 5, not 2.
+
+Correct final output:
+
+Minimum effective costs:
+Vertex 1: 0
+Vertex 2: 5
+Vertex 3: 0
+Vertex 4: 5
+Vertex 5: 2
+
+9. COMPLEXITY ANALYSIS
+
+Let V be the number of vertices and E the number of directed edges.
+
+9.1 Time complexity
+
+The adjacency-list representation requires O(V + E) space and allows
+all outgoing edges to be examined efficiently.
+
+The expanded state graph has:
+    2V states
+    2E transitions
+
+Initializing the two distance values for every vertex takes O(V).
+
+Each transition is examined in constant amortized time by 0-1 BFS.
+With a proper deque implementation, the total shortest-path processing
+time is O(V + E).
+
+Calculating the final answer for all vertices takes O(V).
+
+Therefore:
+
+    T(V, E) = O(V) + O(V + E) + O(V)
+            = O(V + E)
+
+Time Complexity: O(V + E)
+
+9.2 Space complexity
+
+Adjacency lists store V vertices and E directed edges: O(V + E).
+The two-parity distance array requires O(2V) = O(V).
+The deque stores expanded states and requires O(V + E) worst-case
+storage when implemented dynamically.
+
+Therefore:
+
+    S(V, E) = O(V + E)
+
+Space Complexity: O(V + E)
+
+10. IMPORTANT EDGE CASES
+
+1. Source vertex:
+   Its answer is always 0 because the empty path has even parity and
+   accumulated weight 0.
+
+2. Unreachable vertex:
+   If both parity states remain infinite, report unreachable.
+
+3. Penalty C = 0:
+   The effective cost is simply the minimum accumulated path weight,
+   regardless of parity.
+
+4. Zero-weight edges:
+   They do not change parity and are inserted at the front of the deque.
+
+5. One-weight edges:
+   They toggle parity and are inserted at the back of the deque.
+
+6. Multiple paths:
+   Both parity states must be maintained because paths reaching the
+   same vertex can have different parity.
+
+11. CONCLUSION
+
+The parity constraint is handled by expanding every original vertex
+into two states representing even and odd parity. Applying 0-1 BFS to
+this expanded graph efficiently calculates the minimum accumulated
+weight for both states. The final penalty is applied only to the odd
+state. The resulting algorithm runs in O(V + E) time and
+O(V + E) space.

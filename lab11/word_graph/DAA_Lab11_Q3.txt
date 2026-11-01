@@ -1,0 +1,502 @@
+DAA LAB 11
+QUESTION 3
+BIDIRECTIONAL BFS FOR SHORTEST TRANSFORMATION SEQUENCE IN A WORD GRAPH
+======================================================================
+
+1. PROBLEM DESCRIPTION
+
+A dictionary D contains N unique words, each having the same length L.
+A starting word A and a target word B are also given.
+
+A valid mutation changes exactly one character of the current word,
+and the resulting word must belong to the dictionary.
+
+The objective is to find the minimum number of mutations required to
+transform A into B.
+
+The starting word A is allowed to be outside the dictionary, but the
+target word B must belong to the dictionary.
+
+If no valid transformation exists, the algorithm returns -1.
+
+Constraints:
+    N <= 100000
+    L <= 10
+    Words contain only lowercase English letters.
+
+2. CONCEPTS USED
+
+2.1 Word graph
+
+The dictionary can be represented as an implicit undirected graph.
+
+    Each word represents a vertex.
+    An edge connects two words if they differ in exactly one position.
+
+For example:
+
+    COLD and GOLD
+
+differ only at the first character. Therefore, they are adjacent
+vertices in the word graph.
+
+A valid transformation sequence corresponds to a path in this graph.
+
+The number of mutations is equal to the number of edges in the path.
+
+2.2 Breadth-First Search
+
+BFS finds the shortest path in an unweighted graph because it explores
+vertices in increasing order of their distance from the source.
+
+A normal BFS begins at A and continues until B is reached.
+
+However, for a large dictionary, exploring from only one direction may
+visit many unnecessary vertices.
+
+2.3 Bidirectional BFS
+
+Bidirectional BFS performs two simultaneous searches:
+
+    Forward search:
+        Begins at A.
+
+    Backward search:
+        Begins at B.
+
+Both searches expand outwards until they meet.
+
+If a word is reached by both searches, a path connecting A and B has
+been found.
+
+The path length is calculated by adding the distances from both
+directions:
+
+    Total mutations = forwardDist[word] + backwardDist[word]
+
+To reduce the search effort, the algorithm expands the smaller
+currently available BFS frontier.
+
+For a graph with approximately uniform branching factor b and shortest
+path length d, ordinary BFS may explore approximately O(b^d) vertices,
+whereas bidirectional BFS may explore approximately O(b^(d/2)) vertices
+from each direction.
+
+This is an illustrative comparison, not a guaranteed worst-case bound.
+
+2.4 Wildcard pattern indexing
+
+Comparing every dictionary word against every other word is too
+expensive for the given constraints.
+
+Instead, wildcard patterns are used to identify possible neighbors.
+
+For example, the word:
+
+    COLD
+
+generates:
+
+    *OLD
+    C*LD
+    CO*D
+    COL*
+
+The word GOLD also generates *OLD.
+
+Therefore, COLD and GOLD share a pattern and differ at exactly one
+character.
+
+Every word generates L wildcard patterns. A pattern index stores all
+words associated with each pattern.
+
+A hash table allows expected constant-time pattern-table probing,
+apart from the cost of hashing and comparing strings of length L.
+
+3. ALGORITHM
+
+PHASE 1: BUILD THE WILDCARD INDEX
+
+1. Read all dictionary words.
+2. Verify that every word has exactly L characters.
+3. If A is not present in the dictionary, append it as an additional
+   search vertex. This does not add any other non-dictionary words.
+4. For every word:
+      a. Generate L patterns by replacing one position at a time
+         with a wildcard character.
+      b. Insert the word into the corresponding pattern bucket.
+5. Verify that B is present in the dictionary.
+
+PHASE 2: BIDIRECTIONAL BFS
+
+1. Initialize forward and backward distance arrays to -1.
+2. Set forwardDist[A] = 0.
+3. Set backwardDist[B] = 0.
+4. Insert A into the forward queue and B into the backward queue.
+5. While both search frontiers are non-empty:
+      a. Select the smaller current frontier.
+      b. Process the complete current BFS layer.
+      c. For every word u in that layer:
+             Generate its L wildcard patterns.
+             For each pattern not already processed by this search:
+                 Mark the pattern as processed.
+                 Examine all words in its bucket.
+                 Assign distances to newly discovered words.
+                 Check whether any reached word has been visited
+                 by the opposite search.
+      d. Record the smallest meeting distance in the processed layer.
+      e. If a meeting has been found, return that distance.
+6. If the searches finish without meeting, return -1.
+
+4. PSEUDOCODE
+
+BUILD-WILDCARD-INDEX(D):
+
+    create an empty pattern hash table
+
+    for every word w in D:
+
+        for position j = 0 to L - 1:
+
+            pattern = w with position j replaced by '*'
+
+            insert w into the bucket of pattern
+
+BIDIRECTIONAL-BFS(A, B):
+
+    if A == B:
+        return 0
+
+    initialize forwardDist and backwardDist to -1
+
+    forwardDist[A] = 0
+    backwardDist[B] = 0
+
+    initialize forwardQueue with A
+    initialize backwardQueue with B
+
+    while both queues are non-empty:
+
+        choose the smaller current BFS frontier
+
+        bestMeeting = INFINITY
+
+        process every word u in the selected frontier:
+
+            if the opposite search has visited u:
+                update bestMeeting
+
+            for every wildcard pattern of u:
+
+                if this pattern was already processed
+                   by the selected search:
+                    continue
+
+                mark pattern as processed
+
+                for every word v in this pattern bucket:
+
+                    if v is not visited by the selected search:
+                        dist[v] = dist[u] + 1
+                        enqueue v
+
+                    if v is visited by the opposite search:
+                        update bestMeeting
+
+        if bestMeeting is finite:
+            return bestMeeting
+
+    return -1
+
+5. MEETING DISTANCE
+
+Suppose a word x is reached by both searches.
+
+Let:
+
+    forwardDist[x] = distance from A to x
+    backwardDist[x] = distance from B to x
+
+The graph is undirected because changing one character can be
+reversed by changing it back.
+
+Therefore, the path from x to B is represented by the backward
+distance.
+
+The complete path length is:
+
+    distance(A, B) = forwardDist[x] + backwardDist[x]
+
+The algorithm processes a complete BFS layer and considers all
+meeting candidates from that layer before returning the smallest
+meeting distance.
+
+6. SAMPLE INPUT
+
+6 3
+hot
+dot
+dog
+lot
+log
+cog
+hit cog
+
+Input interpretation:
+
+    Number of dictionary words N = 6
+    Word length L = 3
+
+    Dictionary:
+        hot
+        dot
+        dog
+        lot
+        log
+        cog
+
+    Starting word A = hit
+    Target word B = cog
+
+7. SAMPLE OUTPUT
+
+Minimum number of mutations: 4
+
+One shortest transformation sequence is:
+
+    hit -> hot -> dot -> dog -> cog
+
+Another shortest sequence is:
+
+    hit -> hot -> lot -> log -> cog
+
+Both sequences contain four mutations.
+
+8. DRY RUN
+
+Starting word:
+    hit
+
+Target word:
+    cog
+
+Initial search state:
+
+    Forward search:
+        hit, distance 0
+
+    Backward search:
+        cog, distance 0
+
+ITERATION 1
+
+Forward search:
+
+    hit -> hot
+
+Backward search:
+
+    cog -> dog
+    cog -> log
+
+The discovered distances are:
+
+    Forward:
+        hit = 0
+        hot = 1
+
+    Backward:
+        cog = 0
+        dog = 1
+        log = 1
+
+ITERATION 2
+
+Forward search expands from hot:
+
+    hot -> dot
+    hot -> lot
+
+Backward search expands from its current frontier:
+
+    dog -> dot
+    dog -> log
+
+    log -> lot
+    log -> cog
+
+The searches now have common words:
+
+    dot
+    lot
+
+For dot:
+
+    Forward distance = 2
+    Backward distance = 2
+
+    Total = 2 + 2 = 4
+
+For lot:
+
+    Forward distance = 2
+    Backward distance = 2
+
+    Total = 2 + 2 = 4
+
+The minimum number of mutations is therefore 4.
+
+9. COMPLEXITY ANALYSIS
+
+Let:
+    N = number of dictionary words
+    L = length of every word
+
+9.1 Time complexity
+
+STEP 1: Building the wildcard pattern index
+
+Each word generates L patterns.
+
+Creating each pattern requires copying or processing L characters,
+which takes O(L).
+
+Therefore, pattern generation for one word takes:
+
+    O(L * L) = O(L^2)
+
+For N words:
+
+    T1(N, L) = O(NL^2)
+
+The hash table uses expected constant-time probing under a suitable
+hash distribution. Hashing and comparing a pattern still involve
+O(L) character operations, which are included in the above bound.
+
+STEP 2: Bidirectional BFS
+
+Each word is visited at most once by each search.
+
+Each visited word generates L wildcard patterns. Processing each
+pattern requires O(L) time for copying and hashing.
+
+A wildcard bucket is processed at most once per search. The total
+number of word-pattern memberships is N * L, so the total number of
+bucket-member examinations across one search is O(NL).
+
+Thus, the expected total search cost is:
+
+    T2(N, L) = O(NL^2)
+
+The two searches introduce only a constant factor.
+
+STEP 3: Finding A and B
+
+A linear search through N words, comparing strings of length L,
+requires:
+
+    T3(N, L) = O(NL)
+
+TOTAL TIME
+
+    T(N, L) = O(NL^2) + O(NL^2) + O(NL)
+
+Since L >= 1:
+
+    T(N, L) = O(NL^2)
+
+Expected Time Complexity: O(NL^2)
+
+This bound assumes a well-distributed hash table. Hash-table
+operations have expected, not deterministic worst-case, constant
+probing time.
+
+9.2 Space complexity
+
+Dictionary storage:
+    O(NL)
+
+Wildcard patterns:
+    There are at most NL pattern entries, each of length L.
+    Space = O(NL^2)
+
+Pattern membership lists:
+    Each word contributes L memberships.
+    Space = O(NL)
+
+Hash table:
+    O(NL) table capacity.
+
+Forward and backward distance arrays:
+    O(N)
+
+Forward and backward BFS queues:
+    O(N)
+
+Processed-pattern arrays:
+    O(NL)
+
+Therefore:
+
+    S(N, L) = O(NL^2)
+
+Space Complexity: O(NL^2)
+
+10. COMPARISON WITH NAIVE APPROACH
+
+A naive approach compares every pair of words to determine whether
+they differ in exactly one character.
+
+The number of word pairs is:
+
+    N(N - 1) / 2 = O(N^2)
+
+Each comparison examines up to L characters.
+
+Therefore:
+
+    Tnaive(N, L) = O(N^2 L)
+
+The wildcard-index approach instead uses:
+
+    Tindexed(N, L) = O(NL^2) expected
+
+This is substantially more suitable for N up to 100000 and L up to 10.
+
+11. IMPORTANT EDGE CASES
+
+1. A equals B:
+   If the starting and target words are identical, the answer is zero.
+
+2. Target absent from dictionary:
+   The transformation is invalid under the problem constraints.
+   Report that the target is not in the dictionary.
+
+3. Starting word absent from dictionary:
+   Add A as a special search vertex. It is allowed as the initial
+   word, but other non-dictionary words must not be introduced.
+
+4. No valid path:
+   If the searches terminate without meeting, return -1.
+
+5. Direct transformation:
+   If A and B differ in exactly one character and B belongs to the
+   dictionary, the answer is one.
+
+6. Multiple shortest paths:
+   Any shortest path is acceptable because the objective asks for
+   the minimum number of mutations, not a unique sequence.
+
+7. Identical words:
+   Dictionary entries must be unique, as specified by the problem.
+
+12. CONCLUSION
+
+The word transformation problem is modelled as an unweighted word
+graph. Bidirectional BFS searches from both the starting and target
+words, reducing the explored search region in favourable cases.
+Wildcard pattern indexing makes neighbor generation efficient without
+comparing every pair of dictionary words.
+
+The expected time complexity is O(NL^2), and the space complexity is
+O(NL^2).
